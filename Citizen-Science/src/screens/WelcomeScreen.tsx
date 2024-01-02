@@ -1,7 +1,7 @@
 import React from 'react';
 import {Button, SafeAreaView, Text} from "react-native";
 
-{/*TODO: using type:any is not reccomended for ts however code gets too complicated if we do not use it*/}
+{/*TODO: using type:any is not recommended for ts however code gets too complicated if we do not use it*/}
 const WelcomeScreen = ({navigation}: {navigation: any}) => {
     return(
         <SafeAreaView>
