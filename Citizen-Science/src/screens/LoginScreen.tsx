@@ -11,7 +11,7 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 type NavigationParam = {
     Login: undefined;
     Signup: undefined;
-    Splash: undefined;
+    Home: undefined;
 };
 
 //Type for our Navigation in our component
@@ -30,7 +30,7 @@ const LoginScreen: React.FC = () => {
     const handleLoginPress = () => {
         console.log('Login button pressed');
         // logic for what should happen on login press
-        navigation.navigate('Splash');
+        navigation.navigate('Home');
     };
 
     // @ts-ignore

@@ -8,12 +8,12 @@ import SplashScreen from './screens/SplashScreen';
 const Stack = createNativeStackNavigator();
 const AppNavigation = () => {
     return(
-        <Stack.Navigator initialRouteName={"Welcome"}>
+        <Stack.Navigator initialRouteName={"Splash"}>
             <Stack.Screen name="Welcome" component={WelcomeScreen}/>
             <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
             <Stack.Screen name="Signup" component={SignupScreen}/>
             <Stack.Screen name="Home" component={HomeScreen}/>
-            <Stack.Screen name="Splash" component={SplashScreen} />
+            <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
         </Stack.Navigator>
     );
 };
