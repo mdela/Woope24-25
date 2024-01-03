@@ -7,7 +7,7 @@ function SplashScreen() {
     const navigation = useNavigation<NavigationContainerRef<any>>();
 
     useEffect(() => {
-        // Splash screen for 5 seconds
+        // Splash screen for 2 seconds
         const splashTimer = setTimeout(() => {
             navigation.navigate('Welcome'); // This will take us to welcome screen
         }, 2000);
