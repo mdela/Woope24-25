@@ -45,6 +45,18 @@ const NavigationBar = () => {
                 },
                 tabBarActiveTintColor: 'blue',
                 tabBarInactiveTintColor: 'black',
+                tabBarStyle:{
+                    backgroundColor: 'lightblue',
+                    paddingBottom: 5,
+                    paddingTop: 5,
+                    height: 70,
+                    borderTopLeftRadius: 20,
+                    borderTopRightRadius: 20,
+                    bottom: 11,
+                },
+                tabBarLabelStyle: {
+                    marginBottom: 5,
+                },
             })}
         >
             <Tab.Screen name="Home" component={HomeScreen} />
