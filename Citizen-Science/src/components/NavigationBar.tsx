@@ -47,15 +47,15 @@ const NavigationBar = () => {
                 tabBarInactiveTintColor: 'black',
                 tabBarStyle:{
                     backgroundColor: 'lightblue',
-                    paddingBottom: 5,
-                    paddingTop: 5,
-                    height: 70,
+                    paddingBottom: 13,
+                    paddingTop: 2,
+                    height: 80,
                     borderTopLeftRadius: 20,
                     borderTopRightRadius: 20,
-                    bottom: 11,
+
                 },
                 tabBarLabelStyle: {
-                    marginBottom: 5,
+                    marginBottom: 3,
                 },
             })}
         >
