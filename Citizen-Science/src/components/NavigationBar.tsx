@@ -43,8 +43,8 @@ const NavigationBar = () => {
                         </Svg>
                     );
                 },
-                tabBarActiveTintColor: 'tomato',
-                tabBarInactiveTintColor: 'gray',
+                tabBarActiveTintColor: 'blue',
+                tabBarInactiveTintColor: 'black',
             })}
         >
             <Tab.Screen name="Home" component={HomeScreen} />
