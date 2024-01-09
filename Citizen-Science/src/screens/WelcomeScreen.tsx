@@ -73,7 +73,6 @@ const WelcomeScreen: React.FC = () => {
             {/* Login Button */}
             <CustomButton
                 //TODO size will be scaled based on dimension
-                size={{width: 300, height: 70}}
                 label={'Login'}
                 labelColor={'#3a9bdc'}
                 backgroundColor={'white'}
@@ -87,7 +86,6 @@ const WelcomeScreen: React.FC = () => {
             {/* Signup Button */}
             <CustomButton
                 //TODO size will be scaled based on dimension
-                size={{width: 300, height: 70}}
                 label={'Signup'}
                 labelColor={'white'}
                 backgroundColor={'#3a9bdc'}
