@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
-import { StyleSheet, Image, Text, View, TouchableOpacity, Button, TextInput, FlatList } from 'react-native';
+import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Keyboard, FlatList, Platform, TouchableWithoutFeedback, KeyboardAvoidingView} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-
 type Post = {
     image: string;
     text: string;
     id: string;
 };
-
 const HomeScreen = () => {
     const [isPosting, setIsPosting] = useState(false);
     const [postText, setPostText] = useState('');
@@ -21,7 +19,6 @@ const HomeScreen = () => {
             aspect: [4, 3],
             quality: 1,
         });
-
         if (!result.canceled && result.assets && result.assets.length > 0) {
             const uri = result.assets[0].uri;
             setPostImage(uri as string);
@@ -53,64 +50,160 @@ const HomeScreen = () => {
             setError("Please provide text or an image.");
         }
     };
-
     return (
-        <View style={styles.container}>
-            <TouchableOpacity style={styles.postBox} onPress={() => setIsPosting(true)}>
-                <Text style={styles.postBoxText}>Make a Post!</Text>
-            </TouchableOpacity>
-            {isPosting && (
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Write your post here"
-                        value={postText}
-                        onChangeText={setPostText}
-                    />
-                    <Button title="Upload Image" onPress={pickImage} />
-                    {postImage && <Image source={{ uri: postImage}} style={styles.previewImage} />}
-                    <Button title="Submit" onPress={handleSubmit} />
-                    {error ? <Text style={styles.errorText}>{error}</Text> : null}
-                </View>
-            )}
-            <FlatList
-                data={posts}
-                keyExtractor={(item) => item.id} // id as a key
-                renderItem={({ item }) => (
-                    <View style={styles.post}>
-                        {item.text ? <Text style={styles.postText}>{item.text}</Text> : null}
-                        {item.image ? <Image source={{ uri: item.image }} style={styles.postImage} /> : null}
-                    </View>
-                )}
-            />
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <View style={styles.flexContainer}>
+                    <TouchableOpacity style={styles.postBox} onPress={() => setIsPosting(true)}>
+                        <View style={styles.postBoxInner}>
+                            <Text style={styles.postBoxText}>What's on your mind?</Text>
+                        </View>
+                    </TouchableOpacity>
+                    {isPosting && (
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Describe here the details of your post"
+                                value={postText}
+                                onChangeText={setPostText}
+                                multiline
+                                numberOfLines={4}
+                            />
+                            <View style={styles.iconsContainer}>
+                                <TouchableOpacity onPress={pickImage}>
+                                    <Text>🖼️</Text>
+                                </TouchableOpacity>
+                            </View>
+                            {postImage && <Image source={{ uri: postImage }} style={styles.previewImage} />}
+                            <TouchableOpacity style={styles.postButton} onPress={handleSubmit}>
+                                <Text style={styles.postButtonText}>POST</Text>
+                            </TouchableOpacity>
+                            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+                        </View>
+                    )}
 
-        </View>
+                    <FlatList
+                        data={posts}
+                        keyExtractor={(item) => item.id}
+                        renderItem={({ item }) => (
+                            <View style={styles.post}>
+                                {item.text ? <Text style={styles.postText}>{item.text}</Text> : null}
+                                {item.image ? <Image source={{ uri: item.image }} style={styles.postImage} /> : null}
+                            </View>
+                        )}
+                        style={{ width: '100%' }}
+                    />
+                </View>
+            </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
     );
-}
+};
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        marginTop: 50,
-        alignItems: 'center',
+    },
+    flexContainer: {
+        flex: 1,
+        padding: 24,
     },
     postBox: {
-        borderWidth: 1,
-        borderColor: '#ccd0d5',
-        borderRadius: 20,
-        padding: 15,
-        marginBottom: 10,
-        backgroundColor: '#f0f2f5',
+        backgroundColor: '#B4D7EE',
+        borderRadius: 30,
+        paddingVertical: 20,
+        paddingHorizontal: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
         alignSelf: 'stretch',
         marginHorizontal: 10,
+        marginBottom: 30,
+        borderWidth: 1,
+        borderColor: '#E7F3FD',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+        elevation: 5,
+        marginTop: 30,
+    },
+    postBoxInner: {
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: 'transparent',
+        alignSelf: 'stretch',
+        borderBottomWidth: 1,
+        borderBottomColor: '#D1E3FA',
+    },
+    postBoxText: {
+        fontSize: 16,
+        color: '#333',
+        padding: 10,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 18,
+        overflow: 'hidden',
+        textAlign: 'center',
+    },
+    inputContainer: {
+        width: '90%',
+        alignSelf: 'center',
+        paddingHorizontal: 15,
+        paddingVertical: 20,
+        borderRadius: 10,
+        backgroundColor: '#FFFFFF',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+        marginBottom: 20,
+        marginTop: 10,
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#D1E3FA',
+        borderRadius: 20,
+        padding: 15,
+        width: '100%',
+        marginBottom: 10,
+    },
+    previewImage: {
+        width: '100%',
+        height: undefined,
+        aspectRatio: 4 / 3,
+        borderRadius: 10,
+        marginBottom: 10,
+    },
+    postButton: {
+        backgroundColor: '#007AFF',
+        borderRadius: 20,
+        paddingVertical: 10,
+        paddingHorizontal: 30,
+        marginTop: 10,
+        width: '30%',
+        alignSelf: 'flex-end',
+    },
+    postButtonText: {
+        color: '#FFFFFF',
+        textAlign: 'center',
+    },
+    iconsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '100%',
+        justifyContent: 'flex-start',
+        marginBottom: 10,
     },
     post: {
         borderWidth: 1,
         borderColor: '#ccd0d5',
         borderRadius: 10,
-        padding: 10,
-        marginBottom: 10,
+        padding: 20,
         backgroundColor: '#fff',
+        width: '100%',
+        marginBottom: 10, // Added to separate posts visually in the list
     },
     postText: {
         marginBottom: 10,
@@ -121,26 +214,9 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         aspectRatio: 4 / 3,
     },
-    inputContainer: {
-        width: '80%',
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: 'gray',
-        padding: 10,
-        marginBottom: 10,
-    },
-    previewImage: {
-        width: 100,
-        height: 100,
-        marginBottom: 10,
-    },
     errorText: {
         color: 'red',
         marginTop: 10,
-    },
-    postBoxText: {
-        color: '#65676b',
     },
 });
 

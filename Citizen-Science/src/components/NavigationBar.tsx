@@ -49,7 +49,7 @@ const NavigationBar = () => {
                             case 'Home':
                                 IconPath= mdiHome;
                                 break;
-                            case 'CitizenScience':
+                            case 'Citizen Science':
                                 IconPath = mdiTestTube;
                                 break;
                             case 'Calendar':
@@ -83,7 +83,7 @@ const NavigationBar = () => {
                 })}
             >
                 <Tab.Screen name="Home" component={HomeScreen} />
-                <Tab.Screen name="CitizenScience" component={CitizenScienceScreen} />
+                <Tab.Screen name="Citizen Science" component={CitizenScienceScreen} />
                 <Tab.Screen name="Calendar" component={CalendarScreen} />
                 <Tab.Screen name="Resource" component={ResourceScreen} />
                 <Tab.Screen name="Map" component={MapScreen} />
