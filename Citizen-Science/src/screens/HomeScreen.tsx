@@ -187,12 +187,13 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 30,
         marginTop: 10,
-        width: '30%',
+        width: '36%',
         alignSelf: 'flex-end',
     },
     postButtonText: {
         color: '#FFFFFF',
         textAlign: 'center',
+        fontSize: 16,
     },
     iconsContainer: {
         flexDirection: 'row',
