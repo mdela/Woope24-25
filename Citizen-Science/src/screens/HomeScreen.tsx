@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Keyboard, FlatList, Platform, TouchableWithoutFeedback, KeyboardAvoidingView} from 'react-native';
+import React, { useState, useEffect, useRef} from 'react';
+import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 type Post = {
     image: string;
     text: string;
@@ -12,6 +13,8 @@ const HomeScreen = () => {
     const [postImage, setPostImage] = useState<string | null>(null);
     const [posts, setPosts] = useState<Post[]>([]);
     const [error, setError] = useState("");
+    const flatListRef = useRef<any>();
+
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -39,7 +42,7 @@ const HomeScreen = () => {
                 image: postImage || '' // this is being used so that we can also post only a text too!
             };
             // Add the new post to the posts array
-            setPosts([newPost, ...posts]);
+            setPosts(prevPosts => [newPost, ...prevPosts]);
             // Reset the input states for the next post
             setPostText('');
             setPostImage(null);
@@ -50,59 +53,61 @@ const HomeScreen = () => {
             setError("Please provide text or an image.");
         }
     };
+    useEffect(() => {
+        if (posts.length > 0) {
+            flatListRef.current?.scrollToEnd({animated: true});
+        }
+    }, [posts]);
     return (
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <View style={styles.flexContainer}>
-                    <TouchableOpacity style={styles.postBox} onPress={() => setIsPosting(true)}>
-                        <View style={styles.postBoxInner}>
-                            <Text style={styles.postBoxText}>What's on your mind?</Text>
-                        </View>
-                    </TouchableOpacity>
-                    {isPosting && (
-                        <View style={styles.inputContainer}>
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Describe here the details of your post"
-                                value={postText}
-                                onChangeText={setPostText}
-                                multiline
-                                numberOfLines={4}
-                            />
-                            <View style={styles.iconsContainer}>
-                                <TouchableOpacity onPress={pickImage}>
-                                    <Text>🖼️</Text>
-                                </TouchableOpacity>
+        <View style={styles.flexContainer}>
+            <KeyboardAwareFlatList
+                ref={flatListRef}
+                data={posts}
+                keyExtractor={(item) => item.id}
+                renderItem={({item}) => (
+                    <View style={styles.post}>
+                        {item.text ? <Text style={styles.postText}>{item.text}</Text> : null}
+                        {item.image ? <Image source={{uri: item.image}} style={styles.postImage}/> : null}
+                    </View>
+                )}
+                ListHeaderComponent={
+                    <>
+                        <TouchableOpacity style={styles.postBox} onPress={() => setIsPosting(true)}>
+                            <View style={styles.postBoxInner}>
+                                <Text style={styles.postBoxText}>What's on your mind?</Text>
                             </View>
-                            {postImage && <Image source={{ uri: postImage }} style={styles.previewImage} />}
-                            <TouchableOpacity style={styles.postButton} onPress={handleSubmit}>
-                                <Text style={styles.postButtonText}>POST</Text>
-                            </TouchableOpacity>
-                            {error ? <Text style={styles.errorText}>{error}</Text> : null}
-                        </View>
-                    )}
-
-                    <FlatList
-                        data={posts}
-                        keyExtractor={(item) => item.id}
-                        renderItem={({ item }) => (
-                            <View style={styles.post}>
-                                {item.text ? <Text style={styles.postText}>{item.text}</Text> : null}
-                                {item.image ? <Image source={{ uri: item.image }} style={styles.postImage} /> : null}
+                        </TouchableOpacity>
+                        {isPosting && (
+                            <View style={styles.inputContainer}>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Describe here the details of your post"
+                                    value={postText}
+                                    onChangeText={setPostText}
+                                    multiline
+                                    numberOfLines={4}
+                                />
+                                <View style={styles.iconsContainer}>
+                                    <TouchableOpacity onPress={pickImage}>
+                                        <Text>🖼️</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                {postImage && <Image source={{ uri: postImage }} style={styles.previewImage} />}
+                                <TouchableOpacity style={styles.postButton} onPress={handleSubmit}>
+                                    <Text style={styles.postButtonText}>POST</Text>
+                                </TouchableOpacity>
+                                {error ? <Text style={styles.errorText}>{error}</Text> : null}
                             </View>
                         )}
-                        style={{ width: '100%' }}
-                    />
-                </View>
-            </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
+                    </>
+                }
+                showsVerticalScrollIndicator={false}
+            />
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
     flexContainer: {
         flex: 1,
         padding: 24,
@@ -203,7 +208,7 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: '#fff',
         width: '100%',
-        marginBottom: 10, // Added to separate posts visually in the list
+        marginBottom: 10,
     },
     postText: {
         marginBottom: 10,
