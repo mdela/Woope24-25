@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef} from 'react';
+import React, { useState} from 'react';
 import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
@@ -13,7 +13,6 @@ const HomeScreen = () => {
     const [postImage, setPostImage] = useState<string | null>(null);
     const [posts, setPosts] = useState<Post[]>([]);
     const [error, setError] = useState("");
-    const flatListRef = useRef<any>();
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -53,21 +52,20 @@ const HomeScreen = () => {
             setError("Please provide text or an image.");
         }
     };
-    useEffect(() => {
-        if (posts.length > 0) {
-            flatListRef.current?.scrollToEnd({animated: true});
-        }
-    }, [posts]);
+
     return (
         <View style={styles.flexContainer}>
             <KeyboardAwareFlatList
-                ref={flatListRef}
                 data={posts}
                 keyExtractor={(item) => item.id}
                 renderItem={({item}) => (
                     <View style={styles.post}>
-                        {item.text ? <Text style={styles.postText}>{item.text}</Text> : null}
-                        {item.image ? <Image source={{uri: item.image}} style={styles.postImage}/> : null}
+                        <View style={styles.headerRow}>
+                            <Image source={{ uri: 'https://wallpapercave.com/wp/wp4008083.jpg' }} style={styles.avatar} />
+                            <Text style={styles.userName}>User Name,</Text>
+                        </View>
+                        {item.text && <Text style={styles.postText}>{item.text}</Text>}
+                        {item.image && <Image source={{ uri: item.image }} style={styles.postImage} />}
                     </View>
                 )}
                 ListHeaderComponent={
@@ -121,7 +119,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignSelf: 'stretch',
         marginHorizontal: 10,
-        marginBottom: 30,
+        marginBottom: 40,
         borderWidth: 1,
         borderColor: '#E7F3FD',
         shadowColor: '#000',
@@ -208,14 +206,16 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         padding: 20,
         backgroundColor: '#fff',
-        width: '100%',
         marginBottom: 10,
+        alignItems: 'flex-start',
+        width: '100%',
     },
     postText: {
         marginBottom: 10,
         color: '#1c1e21',
     },
     postImage: {
+
         width: '100%',
         borderRadius: 10,
         aspectRatio: 4 / 3,
@@ -224,6 +224,22 @@ const styles = StyleSheet.create({
         color: 'red',
         marginTop: 10,
     },
-});
+    avatar: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        marginBottom: 20,
+    },
+    headerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    userName: {
+        fontSize: 16,
+        marginLeft: 10,
+        marginBottom: 10,
+    },
+})
 
 export default HomeScreen;
