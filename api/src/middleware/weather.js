@@ -8,12 +8,21 @@ import axios from 'axios';
 //Forecast Hourly API Call
 //https://api.weather.gov/gridpoints/City/{x},{y}/forecast/hourly
 
-async function fetch(){
-    const response = await axios({
-        method: 'GET',
-        url: 'https://api.weather.gov/points/46.0853,-100.6746',
-    });
-};
 
-let data = fetch();
-console.log(data);
+const axios = require('axios');
+const initial_api = 'https://api.weather.gov/points/40.0853,-100.6746';
+let forecast_api = '';
+let forecast = '';
+
+axios.get(initial_api)
+    .then(function (response){
+        forecast_api = response.data.properties.forecast;
+        return axios.get(forecast_api);
+    })
+    .then(function(forecast_response){
+        forecast = forecast_response.data;
+        console.log("Forecast:", forecast);
+    })
+    .catch(function (error){
+        console.log(error);
+    });
