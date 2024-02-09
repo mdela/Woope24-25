@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 // Coordinates for Sitting Bull
 // 46.0853,-100.6746
 
@@ -12,7 +10,6 @@ import axios from 'axios';
 const axios = require('axios');
 const initial_api = 'https://api.weather.gov/points/40.0853,-100.6746';
 let forecast_api = '';
-let forecast = '';
 
 axios.get(initial_api)
     .then(function (response){
@@ -20,8 +17,16 @@ axios.get(initial_api)
         return axios.get(forecast_api);
     })
     .then(function(forecast_response){
-        forecast = forecast_response.data;
-        console.log("Forecast:", forecast);
+        let forecast = forecast_response.data.properties.periods;
+
+        // at this point we are inside the periods section of the forecast api
+        // for example: https://api.weather.gov/gridpoints/GLD/93,85/forecast
+        //uncomment the for loop to test what to retrieve for weather widget
+
+        // for (let i = 0; i < forecast.length; i++) {
+        //     console.log(forecast[i].name);
+        // }
+        
     })
     .catch(function (error){
         console.log(error);
