@@ -23,6 +23,7 @@ axios.get(initial_api)
     })
     .then(function(forecast_response){
         let forecast = forecast_response.data.properties.periods;
+        
         // at this point we are inside the periods section of the forecast api
         // for example: https://api.weather.gov/gridpoints/GLD/93,85/forecast
         //uncomment the for loop to test what to retrieve for weather widget
