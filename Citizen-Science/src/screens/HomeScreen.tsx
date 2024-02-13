@@ -1,11 +1,20 @@
-import React, { useState} from 'react';
-import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput} from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
+import * as DocumentPicker from 'expo-document-picker';
+import { MaterialIcons } from '@expo/vector-icons';
+import * as Sharing from 'expo-sharing';
+
+type PdfFile = {
+    uri: string;
+    name: string;
+};
 type Post = {
     image: string;
     text: string;
     id: string;
+    pdfs: PdfFile[];
 };
 const HomeScreen = () => {
     const [isPosting, setIsPosting] = useState(false);
@@ -13,6 +22,7 @@ const HomeScreen = () => {
     const [postImage, setPostImage] = useState<string | null>(null);
     const [posts, setPosts] = useState<Post[]>([]);
     const [error, setError] = useState("");
+    const [postPdfs, setPostPdfs] = useState<PdfFile[]>([]);
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -23,36 +33,68 @@ const HomeScreen = () => {
         });
         if (!result.canceled && result.assets && result.assets.length > 0) {
             const uri = result.assets[0].uri;
-            setPostImage(uri as string);
+            setPostImage(uri);
+        }
+    };
+    const pickPdf = async () => {
+        try {
+            if (postPdfs.length < 10) {
+                const result = await DocumentPicker.getDocumentAsync({
+                    type: 'application/pdf',
+                    copyToCacheDirectory: true,
+                    multiple: true,
+                });
+
+                if (!result.canceled && result.assets) {
+                    const newPdfFiles = result.assets.map(asset => ({
+                        uri: asset.uri,
+                        name: asset.name || 'Unknown Name',
+                    }));
+
+                    setPostPdfs(prev => [...prev, ...newPdfFiles]);
+                } else {
+                    console.log('No PDF was selected.');
+                }
+            } else {
+                Alert.alert('Limit Reached', 'You can only select up to ten PDF files.');
+            }
+        } catch (error) {
+            console.error('Error picking PDFs:', error);
+        }
+    };
+    const handleOpenPdf = async (pdfUri: string) => {
+        try {
+            const isAvailable = await Sharing.isAvailableAsync();
+            if (isAvailable) {
+                await Sharing.shareAsync(pdfUri);
+            } else {
+                alert('Sharing is not available');
+            }
+        } catch (error) {
+            alert('An error occurred while trying to share the PDF.');
+            console.error(error);
         }
     };
     const handleSubmit = () => {
         setError("");
-        // Check if at least postText or postImage is provided
-        if (postText || postImage) {
-            // Generate a unique id for the new post, josue, you'll do our backend database
+        if (postText || postImage || postPdfs.length) {
             const uniqueId = Date.now().toString();
-            // Create a new post object with the unique id
-            // Although, I know that this is basically for an API, but we can use it like this too!
-            // After each id, we'll have our text and image for the bundle.
             const newPost: Post = {
                 id: uniqueId,
                 text: postText,
-                image: postImage || '' // this is being used so that we can also post only a text too!
+                image: postImage || '',
+                pdfs: postPdfs,
             };
-            // Add the new post to the posts array
             setPosts(prevPosts => [newPost, ...prevPosts]);
-            // Reset the input states for the next post
+            // Reset the form the discussion post
             setPostText('');
             setPostImage(null);
-            // Hide the post submission form
+            setPostPdfs([]); // Reset to an empty array for the next post
             setIsPosting(false);
         } else {
-            // If neither text nor image is provided, we'll show an error
-            setError("Please provide text or an image.");
+            setError("Please provide text, an image, or a PDF.");
         }
     };
-
     return (
         <View style={styles.flexContainer}>
             <KeyboardAwareFlatList
@@ -61,11 +103,19 @@ const HomeScreen = () => {
                 renderItem={({item}) => (
                     <View style={styles.post}>
                         <View style={styles.headerRow}>
-                            <Image source={{ uri: 'https://wallpapercave.com/wp/wp4008083.jpg' }} style={styles.avatar} />
-                            <Text style={styles.userName}>User Name,</Text>
+                            <Image source={{uri: 'https://wallpapercave.com/wp/wp4008083.jpg'}} style={styles.avatar}/>
+                            <Text style={styles.userName}>User Name</Text>
                         </View>
                         {item.text && <Text style={styles.postText}>{item.text}</Text>}
-                        {item.image && <Image source={{ uri: item.image }} style={styles.postImage} />}
+                        {item.image && <Image source={{uri: item.image}} style={styles.postImage}/>}
+                        {item.pdfs.map((pdf: PdfFile, index: number) => (
+                            <View key={index} style={styles.pdfItem}>
+                                <TouchableOpacity onPress={() => handleOpenPdf(pdf.uri)}>
+                                    <MaterialIcons name="picture-as-pdf" size={24} color="red" />
+                                    <Text style={styles.pdfName}>{pdf.name}</Text>
+                                </TouchableOpacity>
+                            </View>
+                        ))}
                     </View>
                 )}
                 ListHeaderComponent={
@@ -89,8 +139,16 @@ const HomeScreen = () => {
                                     <TouchableOpacity onPress={pickImage}>
                                         <Text>🖼️</Text>
                                     </TouchableOpacity>
+                                    <TouchableOpacity onPress={pickPdf}>
+                                        <Text>📄</Text>
+                                    </TouchableOpacity>
+                                    {postPdfs.map((pdf: PdfFile, index: number) => (
+                                        <View key={index}>
+                                            <Text>PDF {index + 1}: {pdf.name}</Text>
+                                        </View>
+                                    ))}
                                 </View>
-                                {postImage && <Image source={{ uri: postImage }} style={styles.previewImage} />}
+                                {postImage && <Image source={{uri: postImage}} style={styles.previewImage}/>}
                                 <TouchableOpacity style={styles.postButton} onPress={handleSubmit}>
                                     <Text style={styles.postButtonText}>POST</Text>
                                 </TouchableOpacity>
@@ -103,7 +161,7 @@ const HomeScreen = () => {
             />
         </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
     flexContainer: {
@@ -239,6 +297,19 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginLeft: 10,
         marginBottom: 10,
+    },
+    pdfAttachedText: {
+        marginTop: 10,
+        color: '#007AFF',
+        fontWeight: 'bold',
+    },
+    pdfItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    pdfName: {
+        marginLeft: 10,
     },
 })
 
