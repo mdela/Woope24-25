@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert} from 'react-native';
+import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert, FlatList, Dimensions,  Modal} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 import * as DocumentPicker from 'expo-document-picker';
@@ -11,7 +11,7 @@ type PdfFile = {
     name: string;
 };
 type Post = {
-    image: string;
+    image: string[];
     text: string;
     id: string;
     pdfs: PdfFile[];
@@ -19,21 +19,24 @@ type Post = {
 const HomeScreen = () => {
     const [isPosting, setIsPosting] = useState(false);
     const [postText, setPostText] = useState('');
-    const [postImage, setPostImage] = useState<string | null>(null);
+    const [postImages, setPostImages] = useState<string[]>([]);
     const [posts, setPosts] = useState<Post[]>([]);
     const [error, setError] = useState("");
     const [postPdfs, setPostPdfs] = useState<PdfFile[]>([]);
+    const [isImageViewVisible, setImageViewVisible] = useState(false);
+    const [selectedImageUri, setSelectedImageUri] = useState('');
+
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
             aspect: [4, 3],
             quality: 1,
+            allowsMultipleSelection: true,
         });
         if (!result.canceled && result.assets && result.assets.length > 0) {
-            const uri = result.assets[0].uri;
-            setPostImage(uri);
+            const uris = result.assets.map(asset => asset.uri);
+            setPostImages(prevImages => [...prevImages, ...uris]);
         }
     };
     const pickPdf = async () => {
@@ -75,26 +78,32 @@ const HomeScreen = () => {
             console.error(error);
         }
     };
+
+    const handleImagePress = (uri:string) => {
+        setSelectedImageUri(uri);
+        setImageViewVisible(true);
+    };
     const handleSubmit = () => {
         setError("");
-        if (postText || postImage || postPdfs.length) {
+        if (postText || postImages.length || postPdfs.length) {
             const uniqueId = Date.now().toString();
             const newPost: Post = {
                 id: uniqueId,
                 text: postText,
-                image: postImage || '',
+                image: postImages,
                 pdfs: postPdfs,
             };
             setPosts(prevPosts => [newPost, ...prevPosts]);
             // Reset the form the discussion post
             setPostText('');
-            setPostImage(null);
+            setPostImages([]); // Reset to an empty array for the next post
             setPostPdfs([]); // Reset to an empty array for the next post
             setIsPosting(false);
         } else {
             setError("Please provide text, an image, or a PDF.");
         }
     };
+
     return (
         <View style={styles.flexContainer}>
             <KeyboardAwareFlatList
@@ -107,7 +116,21 @@ const HomeScreen = () => {
                             <Text style={styles.userName}>User Name</Text>
                         </View>
                         {item.text && <Text style={styles.postText}>{item.text}</Text>}
-                        {item.image && <Image source={{uri: item.image}} style={styles.postImage}/>}
+                        {item.image.length > 0 && (
+                            <FlatList
+                                data={item.image}
+                                renderItem={({ item: uri }: { item: string; index: number }) => (
+                                    <TouchableOpacity onPress={() => handleImagePress(uri)}>
+                                        <Image source={{ uri }} style={styles.fullWidthImage} />
+                                    </TouchableOpacity>
+                                )}
+                                horizontal
+                                pagingEnabled={true}
+                                showsHorizontalScrollIndicator={false}
+                                snapToAlignment="center"
+                                snapToInterval={Dimensions.get('window').width}
+                            />
+                        )}
                         {item.pdfs.map((pdf: PdfFile, index: number) => (
                             <View key={index} style={styles.pdfItem}>
                                 <TouchableOpacity onPress={() => handleOpenPdf(pdf.uri)}>
@@ -139,6 +162,11 @@ const HomeScreen = () => {
                                     <TouchableOpacity onPress={pickImage}>
                                         <Text>🖼️</Text>
                                     </TouchableOpacity>
+                                    {postImages.map(( index) => (
+                                        <View key={index}>
+                                            <Text>Image {index + 1}</Text>
+                                        </View>
+                                    ))}
                                     <TouchableOpacity onPress={pickPdf}>
                                         <Text>📄</Text>
                                     </TouchableOpacity>
@@ -148,7 +176,9 @@ const HomeScreen = () => {
                                         </View>
                                     ))}
                                 </View>
-                                {postImage && <Image source={{uri: postImage}} style={styles.previewImage}/>}
+                                {postImages.map((uri, index) => (
+                                    <Image key={index} source={{ uri }} style={styles.previewImage} />
+                                ))}
                                 <TouchableOpacity style={styles.postButton} onPress={handleSubmit}>
                                     <Text style={styles.postButtonText}>POST</Text>
                                 </TouchableOpacity>
@@ -159,6 +189,22 @@ const HomeScreen = () => {
                 }
                 showsVerticalScrollIndicator={false}
             />
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={isImageViewVisible}
+                onRequestClose={() => {
+                    setImageViewVisible(!isImageViewVisible);
+                }}>
+                <View style={styles.centeredView}>
+                    <TouchableOpacity
+                        style={styles.closeButton}
+                        onPress={() => setImageViewVisible(false)}>
+                        <Text style={styles.closeButtonText}>Close</Text>
+                    </TouchableOpacity>
+                    <Image source={{ uri: selectedImageUri }} style={styles.fullScreenImage} />
+                </View>
+            </Modal>
         </View>
     );
 }
@@ -273,10 +319,10 @@ const styles = StyleSheet.create({
         color: '#1c1e21',
     },
     postImage: {
-
-        width: '100%',
+        width: 100,
+        height: 100,
         borderRadius: 10,
-        aspectRatio: 4 / 3,
+        marginRight: 10,
     },
     errorText: {
         color: 'red',
@@ -311,6 +357,57 @@ const styles = StyleSheet.create({
     pdfName: {
         marginLeft: 10,
     },
-})
-
+    imagesContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'flex-start',
+    },
+    imageItem: {
+        width: '30%',
+        aspectRatio: 1,
+        margin: '1%',
+    },
+    image: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 10,
+    },
+    fullWidthImage: {
+        width: Dimensions.get('window').width,
+        height: undefined,
+        aspectRatio: 1,
+        resizeMode: 'contain',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    imageWrapper: {
+        width: Dimensions.get('window').width,
+        alignItems: 'center',
+        justifyContent: 'center',
+        resizeMode: 'contain',
+    },
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    },
+    fullScreenImage: {
+        width: '90%',
+        height: '80%',
+        resizeMode: 'contain',
+    },
+    closeButton: {
+        position: 'absolute',
+        top: 50,
+        right: 20,
+        backgroundColor: 'red',
+        padding: 10,
+        borderRadius: 10,
+    },
+    closeButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+    },
+});
 export default HomeScreen;
