@@ -5,7 +5,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-na
 import Svg, { Path } from 'react-native-svg';
 import { mdiHome, mdiTestTube, mdiCalendar, mdiBookshelf, mdiMapMarker } from '@mdi/js';
 import HomeScreen from '../screens/HomeScreen';
-import CalendarScreen from '../screens/CalendarScreen';
+import CalendarHomeScreen from '../screens/CalendarHomeScreen';
 import MapScreen from '../screens/MapScreen';
 import ResourceScreen from '../screens/ResourceScreen';
 import CitizenScienceScreen from '../screens/CitizenScience';
