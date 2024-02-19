@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert, FlatList, Dimensions,  Modal} from 'react-native';
+import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, Alert, FlatList, Dimensions, Modal, Animated, PanResponder } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 import * as DocumentPicker from 'expo-document-picker';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as Sharing from 'expo-sharing';
+import Comments from '../components/Comments';
 
 type PdfFile = {
     uri: string;
@@ -15,7 +16,14 @@ type Post = {
     text: string;
     id: string;
     pdfs: PdfFile[];
+    comments: Comment[];
+    timestamp: number;
 };
+type Comment = {
+    author: string;
+    text: string;
+};
+
 const HomeScreen = () => {
     const [isPosting, setIsPosting] = useState(false);
     const [postText, setPostText] = useState('');
@@ -25,8 +33,9 @@ const HomeScreen = () => {
     const [postPdfs, setPostPdfs] = useState<PdfFile[]>([]);
     const [isImageViewVisible, setImageViewVisible] = useState(false);
     const [selectedImageUri, setSelectedImageUri] = useState('');
-
-
+    const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+    const [commentsModalVisible, setCommentsModalVisible] = useState(false);
+    const [modalY] = useState(new Animated.Value(0));
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -39,6 +48,7 @@ const HomeScreen = () => {
             setPostImages(prevImages => [...prevImages, ...uris]);
         }
     };
+
     const pickPdf = async () => {
         try {
             if (postPdfs.length < 10) {
@@ -79,10 +89,25 @@ const HomeScreen = () => {
         }
     };
 
-    const handleImagePress = (uri:string) => {
+    const handleImagePress = (uri: string) => {
         setSelectedImageUri(uri);
         setImageViewVisible(true);
     };
+
+    const toggleCommentsModal = (post?: Post) => {
+        setSelectedPost(post || null);
+        setCommentsModalVisible(!commentsModalVisible);
+    };
+    const onAddComment = (postId: string, newComment: Comment) => {
+        const updatedPosts = posts.map(post => {
+            if (post.id === postId) {
+                return { ...post, comments: [...post.comments, newComment] };
+            }
+            return post;
+        });
+        setPosts(updatedPosts);
+    };
+
     const handleSubmit = () => {
         setError("");
         if (postText || postImages.length || postPdfs.length) {
@@ -92,16 +117,45 @@ const HomeScreen = () => {
                 text: postText,
                 image: postImages,
                 pdfs: postPdfs,
+                comments: [],
+                timestamp: Date.now(),
             };
             setPosts(prevPosts => [newPost, ...prevPosts]);
-            // Reset the form the discussion post
             setPostText('');
-            setPostImages([]); // Reset to an empty array for the next post
-            setPostPdfs([]); // Reset to an empty array for the next post
+            setPostImages([]);
+            setPostPdfs([]);
             setIsPosting(false);
         } else {
             setError("Please provide text, an image, or a PDF.");
         }
+    };
+
+    const panResponder = PanResponder.create({
+        onStartShouldSetPanResponder: () => true,
+        onMoveShouldSetPanResponder: () => true,
+        onPanResponderMove: Animated.event([null, {
+            dy: modalY,
+        }], { useNativeDriver: false }),
+        onPanResponderRelease: (e, gestureState) => {
+            if (gestureState.dy > 100) {
+                toggleCommentsModal();
+            } else {
+                Animated.spring(modalY, {
+                    toValue: 0,
+                    useNativeDriver: true,
+                }).start();
+            }
+        },
+    });
+
+    const modalStyle = {
+        transform: [{
+            translateY: modalY.interpolate({
+                inputRange: [0, 100],
+                outputRange: [0, 100],
+                extrapolate: 'clamp',
+            })
+        }]
     };
 
     return (
@@ -109,17 +163,22 @@ const HomeScreen = () => {
             <KeyboardAwareFlatList
                 data={posts}
                 keyExtractor={(item) => item.id}
-                renderItem={({item}) => (
+                renderItem={({ item }) => (
                     <View style={styles.post}>
                         <View style={styles.headerRow}>
-                            <Image source={{uri: 'https://wallpapercave.com/wp/wp4008083.jpg'}} style={styles.avatar}/>
-                            <Text style={styles.userName}>User Name</Text>
+                            <Image source={{ uri: 'https://wallpapercave.com/wp/wp4008083.jpg' }} style={styles.avatar} />
+                            <View style={styles.headerTextContainer}>
+                                <Text style={styles.userName}>User Name</Text>
+                                <Text style={styles.timestamp}>
+                                    {new Date(item.timestamp).toLocaleDateString()} at {new Date(item.timestamp).toLocaleTimeString()}
+                                </Text>
+                            </View>
                         </View>
                         {item.text && <Text style={styles.postText}>{item.text}</Text>}
                         {item.image.length > 0 && (
                             <FlatList
                                 data={item.image}
-                                renderItem={({ item: uri }: { item: string; index: number }) => (
+                                renderItem={({ item: uri }) => (
                                     <TouchableOpacity onPress={() => handleImagePress(uri)}>
                                         <Image source={{ uri }} style={styles.fullWidthImage} />
                                     </TouchableOpacity>
@@ -139,6 +198,10 @@ const HomeScreen = () => {
                                 </TouchableOpacity>
                             </View>
                         ))}
+                        <TouchableOpacity onPress={() => toggleCommentsModal(item)} style={styles.commentButton}>
+                            <MaterialIcons name="comment" size={24} color="#007AFF" />
+                            <Text style={{ color: '#007AFF', marginLeft: 4 }}>{item.comments.length}</Text>
+                        </TouchableOpacity>
                     </View>
                 )}
                 ListHeaderComponent={
@@ -162,7 +225,7 @@ const HomeScreen = () => {
                                     <TouchableOpacity onPress={pickImage}>
                                         <Text>🖼️</Text>
                                     </TouchableOpacity>
-                                    {postImages.map(( index) => (
+                                    {postImages.map((uri, index) => (
                                         <View key={index}>
                                             <Text>Image {index + 1}</Text>
                                         </View>
@@ -170,7 +233,7 @@ const HomeScreen = () => {
                                     <TouchableOpacity onPress={pickPdf}>
                                         <Text>📄</Text>
                                     </TouchableOpacity>
-                                    {postPdfs.map((pdf: PdfFile, index: number) => (
+                                    {postPdfs.map((pdf, index) => (
                                         <View key={index}>
                                             <Text>PDF {index + 1}: {pdf.name}</Text>
                                         </View>
@@ -200,14 +263,29 @@ const HomeScreen = () => {
                     <TouchableOpacity
                         style={styles.closeButton}
                         onPress={() => setImageViewVisible(false)}>
-                        <Text style={styles.closeButtonText}>Close</Text>
+                        <Text style={styles.closeButtonText}>X</Text>
                     </TouchableOpacity>
                     <Image source={{ uri: selectedImageUri }} style={styles.fullScreenImage} />
                 </View>
             </Modal>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={commentsModalVisible}
+                onRequestClose={() => toggleCommentsModal()}>
+                <View style={styles.centeredViews}>
+                    <Animated.View
+                        style={[styles.modalView, modalStyle]}
+                        {...panResponder.panHandlers}>
+                        {selectedPost && (
+                            <Comments comments={selectedPost.comments} postId={selectedPost.id} onAddComment={onAddComment} />
+                        )}
+                    </Animated.View>
+                </View>
+            </Modal>
         </View>
     );
-}
+};
 
 const styles = StyleSheet.create({
     flexContainer: {
@@ -334,16 +412,6 @@ const styles = StyleSheet.create({
         borderRadius: 25,
         marginBottom: 20,
     },
-    headerRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 10,
-    },
-    userName: {
-        fontSize: 16,
-        marginLeft: 10,
-        marginBottom: 10,
-    },
     pdfAttachedText: {
         marginTop: 10,
         color: '#007AFF',
@@ -374,7 +442,7 @@ const styles = StyleSheet.create({
     },
     fullWidthImage: {
         width: Dimensions.get('window').width,
-        height: undefined,
+        height: 400,
         aspectRatio: 1,
         resizeMode: 'contain',
         alignItems: 'center',
@@ -408,6 +476,45 @@ const styles = StyleSheet.create({
     closeButtonText: {
         color: '#fff',
         fontWeight: 'bold',
+    },
+    commentButton: {
+        marginTop: 10,
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+    },
+    centeredViews: {
+        flex: 1,
+        justifyContent: "flex-end",
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalView: {
+        backgroundColor: "white",
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        padding: 35,
+        elevation: 5,
+        width: '100%',
+        height: '60%',
+    },
+    headerRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        marginBottom: 10,
+    },
+    headerTextContainer: {
+        marginLeft: 10,
+        justifyContent: 'center',
+    },
+    userName: {
+        fontSize: 16,
+        marginBottom: 4,
+    },
+    timestamp: {
+        fontSize: 12,
+        color: '#999',
     },
 });
 export default HomeScreen;
