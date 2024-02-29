@@ -20,7 +20,6 @@ export default function App() {
           <Stack.Screen options={{headerShown: false}} name="MapHome" component={MapHome} />
           <Stack.Screen options={{headerShown: false}} name="MapScreen" component={MapScreen} />
           <Stack.Screen options={{headerShown: false}} name="SMapScreen" component={SMapScreen} />
-
         </Stack.Navigator>
       </NavigationContainer>
   );
