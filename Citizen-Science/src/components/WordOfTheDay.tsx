@@ -1,15 +1,14 @@
 import React, { useRef, useState } from 'react';
-import { Text, StyleSheet, TouchableWithoutFeedback, Animated, Dimensions, TouchableOpacity } from 'react-native';
+import { Text, StyleSheet, TouchableWithoutFeedback, Animated, Dimensions, TouchableOpacity, View } from 'react-native';
+import { responsiveWidth } from 'react-native-responsive-dimensions';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Make sure to install this package
 
 interface WordOfTheDay {
     word: string;
     definition: string;
-    bannerTop: number;
-    iconTop: number;
 }
 
-const WordOfTheDayBanner: React.FC<WordOfTheDay> = ({ word, definition ,bannerTop, iconTop}) => {
+const WordOfTheDayBanner: React.FC<WordOfTheDay> = ({ word, definition}) => {
     const [expanded, setExpanded] = useState(false);
     const [visible, setVisible] = useState(true);
     const bannerWidth = Dimensions.get('window').width;
@@ -43,10 +42,10 @@ const WordOfTheDayBanner: React.FC<WordOfTheDay> = ({ word, definition ,bannerTo
     };
 
     return (
-        <>
+        <View style={[styles.container]}>
             {visible && (
                 <TouchableWithoutFeedback onPress={toggleBanner}>
-                    <Animated.View style={[styles.banner, { width: bannerWidth, transform: [{ translateX: slideAnim }], top: bannerTop }]}>
+                    <Animated.View style={[styles.banner, { width: bannerWidth, transform: [{ translateX: slideAnim }] }]}>
                         <Text style={styles.word}>Word of the day: </Text>
                         <Text style={styles.actualWord}>{word}</Text>
                         {expanded && <Text style={styles.definition}>Meaning: {definition}</Text>}
@@ -54,11 +53,11 @@ const WordOfTheDayBanner: React.FC<WordOfTheDay> = ({ word, definition ,bannerTo
                 </TouchableWithoutFeedback>
             )}
             {!visible && (
-                <TouchableOpacity style={[styles.showButton, { top: iconTop }]} onPress={showBanner}>
+                <TouchableOpacity style={[styles.showButton]} onPress={showBanner}>
                     <Icon name="weather-sunset" size={30} color="#FFCC00" />
                 </TouchableOpacity>
             )}
-        </>
+        </View>
     );
 };
 
@@ -96,6 +95,10 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         padding: 10,
     },
+    container: {
+		padding: 50,
+        
+	},
 });
 
 export default WordOfTheDayBanner;

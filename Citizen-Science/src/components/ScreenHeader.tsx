@@ -113,6 +113,9 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({ title, navigation }) => {
 				{/* Maybe Add title */}
 			</View>
 			<WelcomeFadeAway />
+			<WordOfTheDayBanner word={"word"} definition={"words"}/>
+			
+			
 		</SafeAreaView>
 	);
 };
