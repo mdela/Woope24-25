@@ -8,6 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import ScreenTitle from "../components/ScreenTitle";
 import {responsiveHeight, responsiveWidth} from "react-native-responsive-dimensions";
+import WordOfTheDayBanner from "../components/WordOfTheDay";
 
 type NavigationParam = {
     Welcome: undefined;
@@ -29,12 +30,12 @@ const WelcomeScreen: React.FC = () => {
             <LogoName position={'topLeft'} color={'white'} />
 
             {/* Top Right Corner Blob */}
-            <Blobs
-                rotationDeg={'45deg'}
-                widthPercentage={80}
-                heightPercentage={25}
-                image={require('../../assets/blobs/corner_blobs/Corner_Blob_2.png')}
-                position={{top: 85, left: -22}} />
+            {/*<Blobs*/}
+            {/*    rotationDeg={'0deg'}*/}
+            {/*    widthPercentage={80}*/}
+            {/*    heightPercentage={25}*/}
+            {/*    image={require('../../assets/blobs/corner_blobs/Corner_Blob_2.png')}*/}
+            {/*    position={{top: 85, left: -50}} />*/}
 
             {/* First blob cluster */}
             <Blobs rotationDeg={'0deg'} widthPercentage={24} heightPercentage={12} position={{ top: 1, left: 75}} />
@@ -50,6 +51,15 @@ const WelcomeScreen: React.FC = () => {
             <Blobs rotationDeg={'0deg'} widthPercentage={18} heightPercentage={9} position={{ top: 89, left: 81 }} />
             <Blobs rotationDeg={'0deg'} widthPercentage={5} heightPercentage={3} position={{ top: 97, left: 78 }} />
 
+
+            <WordOfTheDayBanner
+                word={"thiwáhe"}
+                definition={"family (especially immediate family)"}
+                bannerTop={150}
+                iconTop={150}
+            />
+
+
             {/* 'Welcome' title */}
             <ScreenTitle
                 text={'Welcome'}
@@ -59,6 +69,9 @@ const WelcomeScreen: React.FC = () => {
                 // Uses responsive library {width, height} through the components file
                 position={{top: 0, left: 0}}
             />
+
+
+
 
             {/* 'Welcome' subtitle in Lakota language */}
             <ScreenTitle

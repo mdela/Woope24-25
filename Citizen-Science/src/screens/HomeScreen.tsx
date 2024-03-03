@@ -13,6 +13,7 @@ import * as Sharing from 'expo-sharing';
 import Comments from '../components/Comments';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
+
 type PdfFile = {
 	uri: string;
 	name: string;
@@ -188,10 +189,12 @@ const HomeScreen = () => {
 
 	return (
 	<View style={styles.flexContainer}>
+
 		{data && <Text>{JSON.stringify(data, null, 2)}</Text>}
 		<TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
 			<MaterialIcons name="logout" size={24} color="black" />
 		</TouchableOpacity>
+
 		<KeyboardAwareFlatList
 			data={posts}
 			keyExtractor={(item) => item.id}
@@ -236,6 +239,8 @@ const HomeScreen = () => {
 					</TouchableOpacity>
 				</View>
 			)}
+
+
 			ListHeaderComponent={
 				<>
 					<TouchableOpacity style={styles.postBox} onPress={() => setIsPosting(true)}>

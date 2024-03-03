@@ -10,6 +10,7 @@ import WelcomeBanner from "./WelcomeBanner";
 import { AuthContext } from "../util/AuthContext";
 import { jwtDecode } from "jwt-decode";
 import { AccessToken } from "../util/token";
+import WordOfTheDayBanner from "../components/WordOfTheDay";
 
 interface ScreenHeaderProps {
 	title: string;
@@ -70,6 +71,7 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({ title, navigation }) => {
 				style={[{ zIndex: 1, transform: [{ translateY: position }], opacity }]}
 			>
 				<WelcomeBanner username={checkNames(firstName, lastName)} />
+
 			</Animated.View>
 		);
 	}
@@ -105,6 +107,8 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({ title, navigation }) => {
 					paddingVertical={3}
 					paddingHorizontal={3}
 				/>
+
+
 
 				{/* Maybe Add title */}
 			</View>
