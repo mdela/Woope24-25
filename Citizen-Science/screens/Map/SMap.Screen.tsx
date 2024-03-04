@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Platform, Text, View, StyleSheet , SafeAreaView, Dimensions} from 'react-native';
+import { Platform, Text, View, StyleSheet , SafeAreaView, Dimensions, Image} from 'react-native';
 import MapView, { Marker } from "react-native-maps";
 import {FAB, Title} from 'react-native-paper';
 import * as Location from 'expo-location';
 import { useNavigation } from "@react-navigation/native";
 import { mapStyle } from './Map.Style';
+import { UserMarkersData } from './Map.Screen';
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
+const customMarkerImage = require('../../assets/College_marker.png');
 
+const markersData = [
+  { title: "CSUN Library", description: "", coordinate: { latitude: 34.239958, longitude: -118.529187 } },
+  { title: "BCE College", description: "", coordinate: { latitude: 46.085323, longitude: -100.674631 } },
+];
 
 
 export const SMapScreen = () => {
@@ -45,14 +51,25 @@ export const SMapScreen = () => {
                       title="Your Location"
                     />
                   )}
-                  <Marker                                                       //hard pin
-                  coordinate={{latitude: 34.239958, longitude: -118.529187}}    //to be replaced with function that loads pins from pin DB  <Image source = {require("../../../assets/vecteezy_college-graduate-icon")} />
-                  title="CSUN Library">
+          {markersData.map((marker, index) => (
+            <Marker
+              key={index}
+              coordinate={marker.coordinate}
+              title={marker.title}
+              description={marker.description}
+            >
+            <Image source={customMarkerImage} style={{ width: 30, height: 30 }} />
+            </Marker>
+          ))}
+                  {UserMarkersData.map((marker, index) => (
+                  <Marker
+                     pinColor='plum'
+                     key={index}
+                     coordinate={marker.coordinate}
+                     title={marker.title}
+                     description={marker.description}>
                   </Marker>
-                  <Marker                                                       //hard pin
-                  coordinate={{latitude: 46.085323, longitude: -100.674631}}
-                  title="BCE College">
-                  </Marker>                                                     
+                    ))}
                 </MapView>
               )}
               </View>

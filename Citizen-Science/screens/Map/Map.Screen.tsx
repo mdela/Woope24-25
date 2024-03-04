@@ -14,7 +14,7 @@ const markersData = [
   { title: "BCE College", description: "", coordinate: { latitude: 46.085323, longitude: -100.674631 } },
 ];
 
-const UserMarkersData = [
+export const UserMarkersData = [
 ];
 
 export const MapScreen = () => {
