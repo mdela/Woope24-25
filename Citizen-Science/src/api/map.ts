@@ -1,12 +1,10 @@
 // { title: "CSUN Library", coordinate: { latitude: 34.239958, longitude: -118.529187 } }
 
-import { getToken } from "../util/token";
-
 async function verifyAuthStatus() {
-    
+    return true;
 }
 
-export const addPin = async (title: string, coordinate: JSON) => {
+export const addPin = async (title: string, longitude: string, latitude: string) => {
     // verify logged in first then,
     if (!verifyAuthStatus()) return false;
 	const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/add-pin`, {
@@ -14,7 +12,7 @@ export const addPin = async (title: string, coordinate: JSON) => {
 		headers: {
 			'Content-Type': 'application/json',
 		},
-		body: JSON.stringify({ title, coordinate }),
+		body: JSON.stringify({ title, longitude, latitude }),
 	});
 
 	if (!response.ok) {
