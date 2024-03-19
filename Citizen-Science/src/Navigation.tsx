@@ -10,6 +10,7 @@ import NavigationBar from "./components/NavigationBar";
 import HomeScreen from "./screens/HomeScreen";
 import {MapScreen} from "./screens/Map/MapScreen";
 import {SMapScreen} from "./screens/Map/SMapScreen";
+import ResourceScreen from './screens/ResourceScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -41,6 +42,7 @@ const AppNavigation = () => {
 			) : (
 				// No token found, user is not signed in
 				<>
+					<Stack.Screen name="Resources" component={ResourceScreen} options={{ animation: 'fade' }} />
 					<Stack.Screen name="Welcome" component={WelcomeScreen} options={{ animation: 'fade' }} />
 					<Stack.Screen name="Login" component={LoginScreen} options={{ animation: 'slide_from_bottom' }} />
 					<Stack.Screen name="Signup" component={SignupScreen} options={{ animation: 'slide_from_bottom' }} />
