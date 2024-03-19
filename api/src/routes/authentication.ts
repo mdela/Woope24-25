@@ -137,5 +137,54 @@ router.post('/verify-access-token', async (req: express.Request, res: express.Re
 });
 
 
+router.post('/add-pin', async (req: express.Request, res: express.Response) => {
+	const { title, longitude, latitude } = req.body;
+
+    if (!title || !longitude || !latitude) {
+        return res.status(400).json('Title and coordinates are required');
+    }
+
+    try {
+		// await pool.query('BEGIN'); // not sure what this does
+		let query = 'INSERT INTO map_pins (title, longitude, latitude) VALUES ($1, $2, $3)';
+		let values = [title, longitude, latitude]
+
+		const pinAddResult = await pool.query(query, values);
+
+		await pool.query('COMMIT');
+
+		return {
+			success: true
+		};
+
+	} catch (error) {
+		await pool.query('ROLLBACK');
+		throw new Error("Error creating pin: " + (error as Error).message);
+	}
+
+});
+
+router.post('/get-pins', async (req: express.Request, res: express.Response) => {
+    try {
+		let query = `
+        SELECT u.*, p.title, p.longitude, p.latitude
+        FROM map_pins u`;
+		let values: string[] = [];
+
+
+		const result = await pool.query(query, values);
+		if (result.rows.length === 0) {
+			return null;
+		}
+
+		const pinRows = result.rows;
+		return pinRows;
+
+	} catch (error) {
+		throw new Error("Error retrieving pins: " + (error as Error).message);
+	}
+    
+});
+
 
 module.exports = router;
