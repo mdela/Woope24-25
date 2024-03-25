@@ -22,6 +22,7 @@ type Event = {
     date: string;
     height: number;
     startTime: string;
+	endTime: string;
     location: string;
 };
 
@@ -52,7 +53,10 @@ const CalendarScreen: React.FC = () => {
 	const now = new Date();
 	const localMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 	const [selectedDate, setSelectedDate] = useState(localMidnight);
+	const [eventStartTime, setEventStartTime] = useState(new Date());
 	const [startTime, setStartTime] = useState('');
+	const [eventEndTime, setEventEndTime] = useState(new Date());
+	const [endTime, setEndTime] = useState('');
 	const [location, setLocation] = useState('');
 
     // TODO Uncomment when implementing backend
@@ -95,10 +99,11 @@ const CalendarScreen: React.FC = () => {
 			date: eventDate,
 			height: 500, // You might want to reconsider the use of 'height' for dynamic content
 			startTime: startTime,
+			endTime: endTime,
 			location: location
 		};
 
-		if (eventName === '' || eventDate === '' || startTime === '' || location === '') {
+		if (eventName === '' || eventDate === '' || startTime === '' || endTime === '' || location === '') {
 			alert('Please enter all details for the event.');
 			return;
 		}
@@ -125,6 +130,7 @@ const CalendarScreen: React.FC = () => {
 			setEventName('');
 			setEventDate('');
 			setStartTime('');
+			setEndTime('');
 			setLocation('');
 			setModalVisible(false);
 
@@ -164,6 +170,16 @@ const CalendarScreen: React.FC = () => {
 		}
 	};
 
+	const handleStartTimeChange = (event: Event, eventStartTime: Date) => {
+		setStartTime(eventStartTime.toLocaleTimeString('en-US'));
+		
+	}
+
+	const handleEndTimeChange = (event: Event, eventEndTime: Date) => {
+		setEndTime(eventEndTime.toLocaleTimeString('en-US'));
+		
+	}
+
 
 	const handleDeleteAllEvents = async () => {
 		try {
@@ -176,11 +192,49 @@ const CalendarScreen: React.FC = () => {
 	};
 
 
+	const [showModal, setShowModal] = useState(false);
 	// Render Items
     const renderItem = (item: Item) => {
         return (
 			<TouchableOpacity style={{marginRight: 10, marginTop: 17}}>
-                <Card>
+            <Card onPress={() => {setShowModal(true)}}>
+				<Modal
+			animationType="slide"
+			transparent={true}
+			visible={showModal}
+			onRequestClose={() => {
+			  setShowModal(false);
+			}}
+		  >
+			{/* Modal content */}
+			<View style={styles.centeredView}>
+			  <View style={styles.modalView}>
+				<Text
+				  style={styles.input}
+				>
+					{item.name}
+				</Text>
+
+				<Text style={styles.input} >
+					{item.location}
+				</Text>
+				<Text
+				  style={styles.input}
+				>
+					{item.startTime}
+				</Text>
+				<Text style={styles.input}>
+					{item.endTime}
+				</Text>
+				
+				
+					<TouchableOpacity
+					  style={styles.cancelButton} onPress={() => setShowModal(false)}>
+						<Text style={styles.cancelButtonText}>Close</Text>
+					  </TouchableOpacity>
+			  </View>
+			</View>
+		  </Modal>
                     <Card.Content>
                         <View
                             style={{
@@ -195,8 +249,12 @@ const CalendarScreen: React.FC = () => {
 
 							<Text style={{fontWeight: 'bold'}}>
                                 {item.name} {'\n'}
+								
                                 <Text style={{fontSize: 12, fontWeight: 'normal'}}>
                                     {item.startTime} {'\n'}
+                                </Text>
+								<Text style={{fontSize: 12, fontWeight: 'normal'}}>
+                                    {item.endTime} {'\n'}
                                 </Text>
                                 <Text style={{fontSize: 12, fontWeight: 'normal', fontStyle: 'italic'}}>
                                     {item.location}
@@ -252,13 +310,7 @@ const CalendarScreen: React.FC = () => {
 				  placeholderTextColor={'darkgray'}
 				/>
 
-				<TextInput
-				  style={styles.input}
-				  placeholder="Start Time (HH:MM AM/PM)"
-				  value={startTime}
-				  onChangeText={setStartTime}
-				  placeholderTextColor="darkgray"
-				/>
+
 				<TextInput
 				  style={styles.input}
 				  placeholder="Set Location"
@@ -266,17 +318,7 @@ const CalendarScreen: React.FC = () => {
 				  onChangeText={setLocation}
 				  placeholderTextColor="darkgray"
 				/>
-				<TextInput
-				  style={styles.input}
-				  placeholder="Event Date (YYYY-MM-DD)"
-				  value={eventDate}
-				  onChangeText={setEventDate}
-				  placeholderTextColor="darkgray"
-				/>
-				<TouchableOpacity onPress={() => setShowDatePicker(true)}>
-						<Text style={styles.datePickerText}>Select Date</Text>
-				</TouchableOpacity>
-				{showDatePicker && (
+				
 					<DateTimePicker
 						testID="dateTimePicker"
 						value={selectedDate}
@@ -285,8 +327,24 @@ const CalendarScreen: React.FC = () => {
 						display="default"
 						onChange={handleDateChange}
 					/>
+						<DateTimePicker
+						testID="dateTimePicker"
+						value={eventStartTime}
+						mode="time"
+						is24Hour={true}
+						display="default"
+						onChange={handleStartTimeChange}
+					/>
+					<DateTimePicker
+						testID="dateTimePicker"
+						value={eventEndTime}
+						mode="time"
+						is24Hour={true}
+						display="default"
+						onChange={handleEndTimeChange}
+					/>
 
-				)}
+				
 				<Button title="Create Event" onPress={userCreateEvent} />
 					<TouchableOpacity
 					  style={styles.cancelButton} onPress={() => setModalVisible(false)}>
