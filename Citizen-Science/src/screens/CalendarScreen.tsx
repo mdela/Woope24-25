@@ -16,6 +16,7 @@ interface Item {
     startTime: string;
     endTime: string;
     location: string;
+	description: string;
 }
 type Event = {
     name: string;
@@ -24,6 +25,7 @@ type Event = {
     startTime: string;
 	endTime: string;
     location: string;
+	description: string;
 };
 
 
@@ -58,6 +60,7 @@ const CalendarScreen: React.FC = () => {
 	const [eventEndTime, setEventEndTime] = useState(new Date());
 	const [endTime, setEndTime] = useState('');
 	const [location, setLocation] = useState('');
+	const [description, setDescription] = useState('');
 
     // TODO Uncomment when implementing backend
 	// testing fetchWithToken
@@ -100,10 +103,11 @@ const CalendarScreen: React.FC = () => {
 			height: 500, // You might want to reconsider the use of 'height' for dynamic content
 			startTime: startTime,
 			endTime: endTime,
-			location: location
+			location: location,
+			description: description
 		};
 
-		if (eventName === '' || eventDate === '' || startTime === '' || endTime === '' || location === '') {
+		if (eventName === '' || eventDate === '' || startTime === '' || endTime === '' || location === '' || description === '') {
 			alert('Please enter all details for the event.');
 			return;
 		}
@@ -132,6 +136,7 @@ const CalendarScreen: React.FC = () => {
 			setStartTime('');
 			setEndTime('');
 			setLocation('');
+			setDescription('');
 			setModalVisible(false);
 
 			loadItems({ dateString: event.date }); // Make sure to refresh the events
@@ -210,22 +215,32 @@ const CalendarScreen: React.FC = () => {
 			<View style={styles.centeredView}>
 			  <View style={styles.modalView}>
 				<Text
-				  style={styles.input}
+				  style={{
+					fontSize: 28,
+
+				  }}
 				>
 					{item.name}
+					
 				</Text>
 
-				<Text style={styles.input} >
-					{item.location}
+				<Text 
+					style={{
+						textAlign: 'left',
+					  }}
+				>
+					Location: {item.location}
+				</Text>
+				<Text>
+					Description: {item.description}
 				</Text>
 				<Text
-				  style={styles.input}
+				
 				>
-					{item.startTime}
+					Time: {item.startTime} - {item.endTime}
 				</Text>
-				<Text style={styles.input}>
-					{item.endTime}
-				</Text>
+			
+				
 				
 				
 					<TouchableOpacity
@@ -318,6 +333,14 @@ const CalendarScreen: React.FC = () => {
 				  onChangeText={setLocation}
 				  placeholderTextColor="darkgray"
 				/>
+
+				<TextInput
+				  style={styles.input}
+				  placeholder="Description"
+				  value={description}
+				  onChangeText={setDescription}
+				  placeholderTextColor="darkgray"
+				/>
 				
 					<DateTimePicker
 						testID="dateTimePicker"
@@ -327,6 +350,9 @@ const CalendarScreen: React.FC = () => {
 						display="default"
 						onChange={handleDateChange}
 					/>
+					<Text>
+						Start Time:
+					</Text>
 						<DateTimePicker
 						testID="dateTimePicker"
 						value={eventStartTime}
@@ -335,6 +361,9 @@ const CalendarScreen: React.FC = () => {
 						display="default"
 						onChange={handleStartTimeChange}
 					/>
+					<Text>
+					End Time:
+				</Text>
 					<DateTimePicker
 						testID="dateTimePicker"
 						value={eventEndTime}
