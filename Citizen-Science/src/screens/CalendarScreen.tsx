@@ -4,11 +4,9 @@ import { fetchWithToken } from '../util/fetchWithToken';
 import { useIsFocused } from "@react-navigation/native";
 import { AuthContext } from "../util/AuthContext";
 import { Agenda } from 'react-native-calendars'; // Calendar ~EV
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import CustomButton from '../components/CustomButton';
+import AsyncStorage from '@react-native-async-storage/async-storage';			// Todo, Delete async storage import as we no longer need it ~ EV
 import { Card, Avatar } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { blue100 } from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
 import { useNavigation } from '@react-navigation/native';
 //import { DateTimePickerAndroid } from '@react-native-community/datetimepicker'; // Android only
 
@@ -42,7 +40,6 @@ const CalendarScreen: React.FC = () => {
 	const [description, setDescription] = useState('');
 
 	const navigation = useNavigation();
-
 
 	//Using DateTimePicker Library  ~EV
 	const [date, setDate] = useState(new Date());
@@ -115,6 +112,8 @@ const CalendarScreen: React.FC = () => {
 			location: location,
 			description: description
 		};
+
+		// Todo, Delete checking as backend handles this ~ EV
 		//if empty fields, promp user to fill in all fields 
 		if (eventName === '' || selectedEventDate === '' || time === '' || location === '') {
 			alert('Please enter all details for the event.');
@@ -122,7 +121,8 @@ const CalendarScreen: React.FC = () => {
 		}
 
 		try {
-			const storedEvents = await AsyncStorage.getItem('events');
+			const storedEvents = await AsyncStorage.getItem('events');						// Todo, Delete local storage component ~ EV
+
 			let parsedStoredEvents = storedEvents ? JSON.parse(storedEvents) : {};
 
 			const updatedEventsForDate = parsedStoredEvents[event.date]
@@ -134,7 +134,7 @@ const CalendarScreen: React.FC = () => {
 				[event.date]: updatedEventsForDate,
 			};
 
-			await AsyncStorage.setItem('events', JSON.stringify(updatedEvents));
+			await AsyncStorage.setItem('events', JSON.stringify(updatedEvents)); 			// Todo, Delete local storage component ~ EV
 
 			// Reset form
 			setEventName('');
@@ -157,7 +157,7 @@ const CalendarScreen: React.FC = () => {
 			return;
 		}
 		try {
-			const storedEvents = await AsyncStorage.getItem('events');
+			const storedEvents = await AsyncStorage.getItem('events');				// Todo, Delete local storage component ~ EV
 			let parsedStoredEvents = storedEvents ? JSON.parse(storedEvents) : {};
 			// REMOVED HARD CODED EVENTS ~EV
 			parsedStoredEvents = { ...parsedStoredEvents };
@@ -171,7 +171,7 @@ const CalendarScreen: React.FC = () => {
 
 	//Render Items ~EV
 	const renderItem = (item: Item) => {
-		const handleModify = () => {
+		const handleModify = () => {												// MODIFY FUNCTION POPULATES HERE ~EV				
 			setEventName(item.name);
 			setLocation(item.location);
 			setDescription(item.description);
@@ -181,14 +181,14 @@ const CalendarScreen: React.FC = () => {
 		};
 		const handleDelete = async () => {
 			try {
-				const storedEvents = await AsyncStorage.getItem('events');
+				const storedEvents = await AsyncStorage.getItem('events');						// Todo, Delete local storage component ~ EV
 				let parsedStoredEvents = storedEvents ? JSON.parse(storedEvents) : {};
 				const updatedEventsForDate = parsedStoredEvents[item.date].filter((event: Event) => event.name !== item.name);
 				const updatedEvents = {
 					...parsedStoredEvents,
 					[item.date]: updatedEventsForDate,
 				};
-				await AsyncStorage.setItem('events', JSON.stringify(updatedEvents));
+				await AsyncStorage.setItem('events', JSON.stringify(updatedEvents));				// Todo, Delete local storage component ~ EV																
 				loadItems({ dateString: item.date });
 			} catch (error) {
 				console.error('Error deleting event:', error);
@@ -220,8 +220,8 @@ const CalendarScreen: React.FC = () => {
 							<Avatar.Text label="C" />
 						</View>
 						<View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-							<Button title="Modify" onPress={handleModify} />
-							<Button title="Delete" onPress={handleDelete} />
+							<Button title="Modify" onPress={handleModify} />					{/* MODIFY BUTTON ~EV */}
+							<Button title="Delete" onPress={handleDelete} />					{/* DELETE BUTTON ~EV */}
 						</View>
 					</Card.Content>
 				</Card>
@@ -311,7 +311,7 @@ const CalendarScreen: React.FC = () => {
 						<Button title="Create Event" onPress={userCreateEvent} />
 						<TouchableOpacity
 							style={styles.cancelButton} onPress={() => setModalVisible(false)}>
-							<Text style={styles.cancelButtonText}>Cancel / Modify</Text>
+							<Text style={styles.cancelButtonText}>Cancel / Modify</Text>					{/* MODIFY BUTTON ~EV */}
 						</TouchableOpacity>
 					</View>
 				</View>
@@ -321,7 +321,7 @@ const CalendarScreen: React.FC = () => {
 					style={styles.createButton}
 					onPress={() => setModalVisible(true)}
 				>
-					<Text style={styles.createButtonText}>Create Event</Text>
+					<Text style={styles.createButtonText}>Create Event</Text>							{/* CREATE MODAL POP UP BUTTON ~EV */}
 				</TouchableOpacity>
 			)}
 		</SafeAreaView>
