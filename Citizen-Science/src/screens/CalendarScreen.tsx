@@ -203,43 +203,57 @@ const CalendarScreen: React.FC = () => {
         return (
 			<TouchableOpacity style={{marginRight: 10, marginTop: 17}}>
             <Card onPress={() => {setShowModal(true)}}>
-				<Modal
-			animationType="slide"
-			transparent={true}
-			visible={showModal}
-			onRequestClose={() => {
-			  setShowModal(false);
-			}}
-		  >
+			<Modal
+				animationType="slide"
+				transparent={true}
+				visible={showModal}
+				onRequestClose={() => {
+			  	setShowModal(false);
+				}}
+		  	>
 			{/* Modal content */}
-			<View style={styles.centeredView}>
-			  <View style={styles.modalView}>
-				<Text
-				  style={{
-					fontSize: 28,
-
-				  }}
-				>
-					{item.name}
-					
-				</Text>
+				<View style={styles.centeredView}>
+					<View 
+						style={[styles.modalView, {
+							padding: 10,
+							height: 400,
+							width: 400,
+							alignItems: 'flex-start',
+						}]}
+						
+					>
+							<Text
+				  				style={{		
+									fontSize: 28,
+									padding: 0,
+									paddingVertical: 1,
+								
+				  				}}
+							>
+								{item.name} {'\n'}
+								
+							</Text>
 
 				<Text 
 					style={{
-						textAlign: 'left',
+						alignItems: 'flex-start',
 					  }}
 				>
-					Location: {item.location}
+					Location: {item.location} {'\n'}
 				</Text>
-				<Text>
-					Description: {item.description}
+				<Text
+					style={{
+						alignItems: 'flex-start',
+					  }}
+					>
+					Description: {item.description} {'\n'}
 				</Text>
 				<Text
 				
 				>
 					Time: {item.startTime} - {item.endTime}
 				</Text>
-			
+					  
 				
 				
 				
@@ -247,7 +261,8 @@ const CalendarScreen: React.FC = () => {
 					  style={styles.cancelButton} onPress={() => setShowModal(false)}>
 						<Text style={styles.cancelButtonText}>Close</Text>
 					  </TouchableOpacity>
-			  </View>
+					  </View>
+			  
 			</View>
 		  </Modal>
                     <Card.Content>
@@ -371,6 +386,7 @@ const CalendarScreen: React.FC = () => {
 						is24Hour={true}
 						display="default"
 						onChange={handleEndTimeChange}
+						format='y-MM-dd h:mm:ss a'
 					/>
 
 				
@@ -453,34 +469,6 @@ const CalendarScreen: React.FC = () => {
 		color: '#FFFFFF',
 		fontSize: 18,
 		textAlign: 'center',
-	  },
-	  centeredView: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-	  },
-	  modalView: {
-		backgroundColor: 'white', //B3FAF4
-		borderRadius: 20,
-		padding: 65,
-		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOffset: {
-		  width: 2,
-		  height: 2,
-		},
-		shadowOpacity: 0.25,
-		shadowRadius: 4,
-		elevation: 5,
-	  },
-	  input: {
-		height: 50,
-		borderColor: 'gray',
-		borderWidth: 1,
-		marginBottom: 30,
-		paddingHorizontal: 10,
-		width: 250,
-		backgroundColor: 'white',
 	  },
 	  datePickerText: {
         marginBottom: 10,
