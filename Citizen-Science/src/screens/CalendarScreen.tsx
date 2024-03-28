@@ -17,6 +17,8 @@ interface Item {
     endTime: string;
     location: string;
 	description: string;
+	formattedStartTime: string; 
+	formattedEndTime: string;
 }
 type Event = {
     name: string;
@@ -26,42 +28,30 @@ type Event = {
 	endTime: string;
     location: string;
 	description: string;
+	formattedStartTime: string; 
+	formattedEndTime: string;
 };
 
 
-const CalendarScreen: React.FC = () => {
-	// Todo, remove this after trip
-    const hard_coded_events = {
-        '2024-02-21': [
-            {name: 'Flying out to North Dakota', startTime: '10:00am', endTime: '11:00am', location: 'LAX Airport'}
-        ],
-        '2024-02-24': [
-            {name: 'Flying back to Los Angeles', startTime: '10:00am', endTime: '11:00am', location: 'Bismark Airport'}
-        ],
-        '2024-02-22': [
-            {name: 'Meeting with Dr. Mafany', startTime: '8:00am', endTime: '6:00pm', location: 'Sitting Bull College'}
-        ],
-        '2024-02-23': [
-            {name: 'Demo app for SBC' , startTime: '8:00am', endTime: '3:00pm', location: 'Sitting Bull College'}
-        ]
 
-    };
+const CalendarScreen: React.FC = () => {
 
 	const [items, setItems] = useState({});
 	const [modalVisible, setModalVisible] = useState(false);
 	const [eventName, setEventName] = useState('');
 	const [eventDate, setEventDate] = useState('');
-	const [showDatePicker, setShowDatePicker] = useState(false);
 	const now = new Date();
 	const localMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 	const [selectedDate, setSelectedDate] = useState(localMidnight);
+	const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 	const [eventStartTime, setEventStartTime] = useState(new Date());
 	const [startTime, setStartTime] = useState('');
 	const [eventEndTime, setEventEndTime] = useState(new Date());
 	const [endTime, setEndTime] = useState('');
 	const [location, setLocation] = useState('');
 	const [description, setDescription] = useState('');
-
+	const [formattedStartTime, setFormattedStartTime] = useState('');
+	const [formattedEndTime, setFormattedEndTime] = useState('');
     // TODO Uncomment when implementing backend
 	// testing fetchWithToken
 	// useEffect(() => {
@@ -80,6 +70,8 @@ const CalendarScreen: React.FC = () => {
 
 	// Calendar ~EV
 
+
+	
 	const loadItems = async (day: any) => {
 		if (!day) {
 			return;
@@ -88,7 +80,7 @@ const CalendarScreen: React.FC = () => {
 			const storedEvents = await AsyncStorage.getItem('events');
 			let parsedStoredEvents = storedEvents ? JSON.parse(storedEvents) : {};
 			// Merge hard-coded events with stored events
-			parsedStoredEvents = { ...parsedStoredEvents, ...hard_coded_events };
+			parsedStoredEvents = { ...parsedStoredEvents };
 			setItems(parsedStoredEvents);
 		} catch (error) {
 			console.error('Error loading events:', error);
@@ -166,7 +158,6 @@ const CalendarScreen: React.FC = () => {
 
 	const handleDateChange = (event: Event, selectedDate: Date) => {
 		if (selectedDate !== undefined) {
-			setShowDatePicker(false);
 			const year = selectedDate.getFullYear();
 			const month = ("0" + (selectedDate.getMonth() + 1)).slice(-2); // Months are 0 indexed so +1 and slice for leading 0
 			const day = ("0" + selectedDate.getDate()).slice(-2);
@@ -176,7 +167,15 @@ const CalendarScreen: React.FC = () => {
 	};
 
 	const handleStartTimeChange = (event: Event, eventStartTime: Date) => {
-		setStartTime(eventStartTime.toLocaleTimeString('en-US'));
+		const year = eventStartTime.getFullYear();
+		const month = ("0" + (eventStartTime.getMonth() + 1)).slice(-2); // getMonth() is zero-indexed
+		const day = ("0" + eventStartTime.getDate()).slice(-2);
+		const hours = ("0" + eventStartTime.getHours()).slice(-2);
+		const minutes = ("0" + eventStartTime.getMinutes()).slice(-2);
+		const seconds = ("0" + eventStartTime.getSeconds()).slice(-2);
+	
+		setFormattedStartTime(`${year}-${month}-${day} ${hours}:${minutes}:${seconds}`);
+		setStartTime(`${hours}:${minutes}:${seconds}`);
 		
 	}
 
@@ -196,14 +195,19 @@ const CalendarScreen: React.FC = () => {
 		}
 	};
 
-
+	//show modal for viewing event details
 	const [showModal, setShowModal] = useState(false);
+
 	// Render Items
     const renderItem = (item: Item) => {
         return (
 			<TouchableOpacity style={{marginRight: 10, marginTop: 17}}>
-            <Card onPress={() => {setShowModal(true)}}>
-			<Modal
+            <Card onPress={() => {
+				setSelectedItem(item);
+				setShowModal(true)
+			}}>
+			if(selectedItem !== null){
+				<Modal
 				animationType="slide"
 				transparent={true}
 				visible={showModal}
@@ -222,78 +226,71 @@ const CalendarScreen: React.FC = () => {
 						}]}
 						
 					>
-							<Text
-				  				style={{		
-									fontSize: 28,
-									padding: 0,
-									paddingVertical: 1,
-								
-				  				}}
-							>
-								{item.name} {'\n'}
-								
-							</Text>
+						<Text
+				  			style={{		
+								fontSize: 28,
+								padding: 0,
+								paddingVertical: 1,
+				  			}}
+						>
+							{selectedItem.name} {'\n'}	
+						</Text>
 
-				<Text 
+						<Text 
 					style={{
 						alignItems: 'flex-start',
-					  }}
+					}}
 				>
-					Location: {item.location} {'\n'}
-				</Text>
-				<Text
+					Location: {selectedItem.location} {'\n'}
+						</Text>
+
+						<Text
 					style={{
 						alignItems: 'flex-start',
-					  }}
-					>
-					Description: {item.description} {'\n'}
-				</Text>
-				<Text
+					}}
+				>
+					Description: {selectedItem.description} {'\n'}
+						</Text>
+
+						<Text
 				
 				>
-					Time: {item.startTime} - {item.endTime}
-				</Text>
+					Time: {selectedItem.startTime} - {selectedItem.endTime}
+					
+						</Text>
 					  
-				
-				
-				
-					<TouchableOpacity
-					  style={styles.cancelButton} onPress={() => setShowModal(false)}>
-						<Text style={styles.cancelButtonText}>Close</Text>
-					  </TouchableOpacity>
-					  </View>
-			  
-			</View>
-		  </Modal>
-                    <Card.Content>
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                            }}>
+						<TouchableOpacity
+							style={styles.cancelButton} onPress={() => setShowModal(false)}>
+							<Text style={styles.cancelButtonText}>Close</Text>
+					  	</TouchableOpacity>
+					</View>
+			  	</View>
+		  		</Modal>
+	}
 
-							{/*<Button title="Delete All Events" onPress={handleDeleteAllEvents} />*/}
-
-
-
-							<Text style={{fontWeight: 'bold'}}>
-                                {item.name} {'\n'}
-								
-                                <Text style={{fontSize: 12, fontWeight: 'normal'}}>
-                                    {item.startTime} {'\n'}
-                                </Text>
-								<Text style={{fontSize: 12, fontWeight: 'normal'}}>
-                                    {item.endTime} {'\n'}
-                                </Text>
-                                <Text style={{fontSize: 12, fontWeight: 'normal', fontStyle: 'italic'}}>
-                                    {item.location}
-                                </Text>
-                            </Text>
-                            <Avatar.Text label="C"/>
-                        </View>
-                    </Card.Content>
-                </Card>
+        		<Card.Content>
+                	<View
+                     style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                }}>
+					<Text style={{fontWeight: 'bold'}}>
+                        {item.name} {'\n'}
+						<Text style={{fontSize: 12, fontWeight: 'normal'}}>
+                            {item.startTime} {'\n'}
+                        </Text>
+						<Text style={{fontSize: 12, fontWeight: 'normal'}}>
+                            {item.endTime} {'\n'}
+                        </Text>
+                        <Text style={{fontSize: 12, fontWeight: 'normal', fontStyle: 'italic'}}>
+                            {item.location}
+                        </Text>
+                    </Text>
+                    	<Avatar.Text label="C"/>
+                	</View>
+            	</Card.Content>
+            </Card>
             </TouchableOpacity>
 		);
     };
@@ -301,27 +298,27 @@ const CalendarScreen: React.FC = () => {
 	return (
 		<SafeAreaView style={[styles.container, {backgroundColor: modalVisible ? 'white' : 'white'}]}>
 		  <Agenda
-			  items={items}
-			  loadItemsForMonth={loadItems}
-			  renderItem={renderItem}
-			  theme={{
-				  agendaDayTextColor: '#5EA1E9',
-				  agendaDayNumColor: '#5EA1E9',
-				  agendaTodayColor: '#5EA1E9',
-				  agendaKnobColor: '#5EA1E9'
-			  }}
+			items={items}
+			loadItemsForMonth={loadItems}
+			renderItem={renderItem}
+			theme={{
+				agendaDayTextColor: '#5EA1E9',
+				agendaDayNumColor: '#5EA1E9',
+				agendaTodayColor: '#5EA1E9',
+				agendaKnobColor: '#5EA1E9'
+			}}
 
-			  renderEmptyData={() => {
-				  return (
-					  <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-						  <Text>No Items For This Day</Text>
-					  </View>
-				  );
-			  }}
+			renderEmptyData={() => {
+				return (
+					<View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+						<Text>No Items For This Day</Text>
+					</View>
+				);
+			}}
 
 		  />
 
-		  <Modal
+		<Modal
 			animationType="slide"
 			transparent={true}
 			visible={modalVisible}
@@ -357,57 +354,59 @@ const CalendarScreen: React.FC = () => {
 				  placeholderTextColor="darkgray"
 				/>
 				
-					<DateTimePicker
-						testID="dateTimePicker"
-						value={selectedDate}
-						mode="date"
-						is24Hour={true}
-						display="default"
-						onChange={handleDateChange}
-					/>
-					<Text>
-						Start Time:
-					</Text>
-						<DateTimePicker
-						testID="dateTimePicker"
-						value={eventStartTime}
-						mode="time"
-						is24Hour={true}
-						display="default"
-						onChange={handleStartTimeChange}
-					/>
-					<Text>
+				<DateTimePicker
+					testID="dateTimePicker"
+					value={selectedDate}
+					mode="date"
+					is24Hour={true}
+					display="default"
+					onChange={handleDateChange}
+				/>
+
+				<Text>
+					Start Time:
+				</Text>
+
+				<DateTimePicker
+					testID="dateTimePicker"
+					value={eventStartTime}
+					mode="time"
+					is24Hour={true}
+					display="default"
+					onChange={handleStartTimeChange}
+				/>
+
+				<Text>
 					End Time:
 				</Text>
-					<DateTimePicker
-						testID="dateTimePicker"
-						value={eventEndTime}
-						mode="time"
-						is24Hour={true}
-						display="default"
-						onChange={handleEndTimeChange}
-						format='y-MM-dd h:mm:ss a'
-					/>
 
-				
+				<DateTimePicker
+					testID="dateTimePicker"
+					value={eventEndTime}
+					mode="time"
+					is24Hour={true}
+					display="default"
+					onChange={handleEndTimeChange}
+					format='y-MM-dd h:mm:ss a'
+				/>
+
 				<Button title="Create Event" onPress={userCreateEvent} />
 					<TouchableOpacity
 					  style={styles.cancelButton} onPress={() => setModalVisible(false)}>
-						<Text style={styles.cancelButtonText}>Cancel</Text>
-					  </TouchableOpacity>
+					  <Text style={styles.cancelButtonText}>Cancel</Text>
+					</TouchableOpacity>
 			  </View>
 			</View>
-		  </Modal>
-			{!modalVisible && (
+		</Modal>
+		{!modalVisible && (
 			<TouchableOpacity
-			style={styles.createButton}
-			onPress={() => setModalVisible(true)}
+				style={styles.createButton}
+				onPress={() => setModalVisible(true)}
 			>
-			<Text style={styles.createButtonText}>Create Event</Text>
+				<Text style={styles.createButtonText}>Create Event</Text>
 			</TouchableOpacity>
 		)}
 		</SafeAreaView>
-
 	  );
 	};
 
