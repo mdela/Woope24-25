@@ -12,26 +12,21 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 interface Item {
     name: string;
     height: number;
-    day: Date;
+    date: string;
     startTime: string;
     endTime: string;
     location: string;
 	description: string;
-	formattedStartTime: string; 
-	formattedEndTime: string;
 }
-type Event = {
-    name: string;
-    date: string;
-    height: number;
-    startTime: string;
-	endTime: string;
-    location: string;
-	description: string;
-	formattedStartTime: string; 
-	formattedEndTime: string;
-};
-
+// type Event = {
+//     name: string;
+//     date: string;
+//     height: number;
+//     startTime: string;
+// 	endTime: string;
+//     location: string;
+// 	description: string;
+// };
 
 
 const CalendarScreen: React.FC = () => {
@@ -50,8 +45,8 @@ const CalendarScreen: React.FC = () => {
 	const [endTime, setEndTime] = useState('');
 	const [location, setLocation] = useState('');
 	const [description, setDescription] = useState('');
-	const [formattedStartTime, setFormattedStartTime] = useState('');
-	const [formattedEndTime, setFormattedEndTime] = useState('');
+
+	//If this is not needed for backend it can be deleted
     // TODO Uncomment when implementing backend
 	// testing fetchWithToken
 	// useEffect(() => {
@@ -70,8 +65,6 @@ const CalendarScreen: React.FC = () => {
 
 	// Calendar ~EV
 
-
-	
 	const loadItems = async (day: any) => {
 		if (!day) {
 			return;
@@ -89,7 +82,7 @@ const CalendarScreen: React.FC = () => {
 
 	const userCreateEvent = async () => {
 		// Include startTime and location in the event object
-		const event: Event = {
+		const event: Item = {
 			name: eventName,
 			date: eventDate,
 			height: 500, // You might want to reconsider the use of 'height' for dynamic content
@@ -99,11 +92,13 @@ const CalendarScreen: React.FC = () => {
 			description: description
 		};
 
+		//To check if all fields are filled
 		if (eventName === '' || eventDate === '' || startTime === '' || endTime === '' || location === '' || description === '') {
 			alert('Please enter all details for the event.');
 			return;
 		}
 
+		//try statement to store locally
 		try {
 			const storedEvents = await AsyncStorage.getItem('events');
 			let parsedStoredEvents = storedEvents ? JSON.parse(storedEvents) : {};
@@ -139,23 +134,6 @@ const CalendarScreen: React.FC = () => {
 	};
 
 
-	const deleteEvent = async (day: string, event: Event) => {		// Handle for the User Deleted Cal Events ~EV
-		try {
-			const storedEvents = await AsyncStorage.getItem('events');
-			const parsedStoredEvents = storedEvents ? JSON.parse(storedEvents) : {};
-			const updatedEvents = {
-				...parsedStoredEvents,
-				[day]: parsedStoredEvents[day].filter((e: Event) => e !== event),
-			};
-			await AsyncStorage.setItem('events', JSON.stringify(updatedEvents));
-			loadItems(day);
-		} catch (error) {
-			console.log(error, 'error in event deletion');
-			alert('Error deleting event');
-		}
-	};
-
-
 	const handleDateChange = (event: Event, selectedDate: Date) => {
 		if (selectedDate !== undefined) {
 			const year = selectedDate.getFullYear();
@@ -166,47 +144,69 @@ const CalendarScreen: React.FC = () => {
 		}
 	};
 
-	const handleStartTimeChange = (event: Event, eventStartTime: Date) => {
-		const year = eventStartTime.getFullYear();
-		const month = ("0" + (eventStartTime.getMonth() + 1)).slice(-2); // getMonth() is zero-indexed
-		const day = ("0" + eventStartTime.getDate()).slice(-2);
-		const hours = ("0" + eventStartTime.getHours()).slice(-2);
-		const minutes = ("0" + eventStartTime.getMinutes()).slice(-2);
-		const seconds = ("0" + eventStartTime.getSeconds()).slice(-2);
+	const formatDateAndTime = (date, time) => {
+		const year = date.getFullYear();
+		const month = ("0" + (date.getMonth() + 1)).slice(-2);
+		const day = ("0" + date.getDate()).slice(-2);
+		const hours = ("0" + time.getHours()).slice(-2);
+		const minutes = ("0" + time.getMinutes()).slice(-2);
+		const seconds = ("0" + time.getSeconds()).slice(-2);
 	
-		setFormattedStartTime(`${year}-${month}-${day} ${hours}:${minutes}:${seconds}`);
-		setStartTime(`${hours}:${minutes}:${seconds}`);
-		
-	}
-
-	const handleEndTimeChange = (event: Event, eventEndTime: Date) => {
-		setEndTime(eventEndTime.toLocaleTimeString('en-US'));
-		
-	}
-
-
-	const handleDeleteAllEvents = async () => {
-		try {
-			await AsyncStorage.removeItem('events');
-			console.log('All events deleted successfully');
-			// Optionally set state or trigger a UI update
-		} catch (error) {
-			console.error('Error deleting all events:', error);
+		return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+	};
+	
+	const handleStartTimeChange = (event, eventStartTime) => {
+		if (eventStartTime) {
+			const formattedDateTime = formatDateAndTime(selectedDate, eventStartTime);
+			setStartTime(formattedDateTime);
 		}
 	};
+	
+	const handleEndTimeChange = (event, eventEndTime) => {
+		if (eventEndTime) {
+			const formattedDateTime = formatDateAndTime(selectedDate, eventEndTime);
+			setEndTime(formattedDateTime);
+		}
+	};
+	
+
+
+
 
 	//show modal for viewing event details
 	const [showModal, setShowModal] = useState(false);
 
 	// Render Items
     const renderItem = (item: Item) => {
+		const handleModify = () =>{
+			setEventName(item.name);
+			setLocation(item.location);
+			setDescription(item.description);
+			setSelectedDate(item.date);
+			setStartTime(item.startTime);
+			setEndTime(item.endTime);
+		}
+		const handleDelete = async () => {
+			try{
+				const storedEvents = await AsyncStorage.getItem('events');
+				let parsedStoredEvents = storedEvents ? JSON.parse(storedEvents) : {};
+				const updatedEventsForDate = parsedStoredEvents[item.date].filter((event: Event) => event.name !== item.name);
+				const updatedEvents = {
+					...parsedStoredEvents,
+					[item.date]: updatedEventsForDate,
+				};
+				await AsyncStorage.setItem('events', JSON.stringify(updatedEvents));
+				loadItems({ dateStringL: item.date});
+
+			} catch (error) {
+				console.error('Error deleting event:', error);
+			}
+		};
         return (
 			<TouchableOpacity style={{marginRight: 10, marginTop: 17}}>
             <Card onPress={() => {
 				setSelectedItem(item);
-				setShowModal(true)
-			}}>
-			if(selectedItem !== null){
+				setShowModal(true)}}>
 				<Modal
 				animationType="slide"
 				transparent={true}
@@ -233,7 +233,7 @@ const CalendarScreen: React.FC = () => {
 								paddingVertical: 1,
 				  			}}
 						>
-							{selectedItem.name} {'\n'}	
+							{item.name} {'\n'}	
 						</Text>
 
 						<Text 
@@ -241,7 +241,7 @@ const CalendarScreen: React.FC = () => {
 						alignItems: 'flex-start',
 					}}
 				>
-					Location: {selectedItem.location} {'\n'}
+					Location: {item.location} {'\n'}
 						</Text>
 
 						<Text
@@ -249,14 +249,14 @@ const CalendarScreen: React.FC = () => {
 						alignItems: 'flex-start',
 					}}
 				>
-					Description: {selectedItem.description} {'\n'}
+					Description: {item.description} {'\n'}
 						</Text>
 
 						<Text
 				
 				>
-					Time: {selectedItem.startTime} - {selectedItem.endTime}
-					
+					Time: {item.startTime} - {item.endTime}
+					{selectedDate.toLocaleString()}
 						</Text>
 					  
 						<TouchableOpacity
@@ -266,7 +266,6 @@ const CalendarScreen: React.FC = () => {
 					</View>
 			  	</View>
 		  		</Modal>
-	}
 
         		<Card.Content>
                 	<View
@@ -289,6 +288,11 @@ const CalendarScreen: React.FC = () => {
                     </Text>
                     	<Avatar.Text label="C"/>
                 	</View>
+
+					<View style={{ flexDirection: 'row', justifyContent: 'space-around'}}>
+						<Button title="Modify" onPress={handleModify} />
+						<Button title="Delete" onPress={handleDelete} />
+					</View>
             	</Card.Content>
             </Card>
             </TouchableOpacity>
@@ -336,8 +340,7 @@ const CalendarScreen: React.FC = () => {
 				  onChangeText={setEventName}
 				  placeholderTextColor={'darkgray'}
 				/>
-
-
+				
 				<TextInput
 				  style={styles.input}
 				  placeholder="Set Location"
@@ -393,7 +396,7 @@ const CalendarScreen: React.FC = () => {
 				<Button title="Create Event" onPress={userCreateEvent} />
 					<TouchableOpacity
 					  style={styles.cancelButton} onPress={() => setModalVisible(false)}>
-					  <Text style={styles.cancelButtonText}>Cancel</Text>
+					  <Text style={styles.cancelButtonText}>Cancel / Modify</Text>
 					</TouchableOpacity>
 			  </View>
 			</View>
