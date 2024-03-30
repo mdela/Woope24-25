@@ -1,3 +1,4 @@
+
 export const loginUser = async (email: string, password: string) => {
 	const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/login`, {
 		method: 'POST',
