@@ -1,12 +1,12 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {View, Text, StyleSheet, Button, Modal, TextInput, TouchableOpacity, Dimensions, SafeAreaView} from 'react-native';
+import {View, Text, StyleSheet, Modal, TextInput, TouchableOpacity, Dimensions, SafeAreaView} from 'react-native';
 import {fetchWithToken} from '../util/fetchWithToken';
 import {useIsFocused} from "@react-navigation/native";
 import {AuthContext} from "../util/AuthContext";
 import {Agenda} from 'react-native-calendars'; // Calendar ~EV
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomButton from '../components/CustomButton';
-import { Card, Avatar } from 'react-native-paper';
+import { Card, Avatar, Button, IconButton } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 interface Item {
@@ -226,22 +226,67 @@ const CalendarScreen: React.FC = () => {
 						}]}
 						
 					>
+						<View style={{ 
+							//display: 'flex',
+							flexDirection: 'row', 
+							//justifyContent: 'flex-end',
+							
+							}}>
+						<IconButton 
+							icon="close" 
+							style={{
+								marginVertical: 0, 
+								paddingLeft: 0, 
+								paddingRight: 20,
+								display: 'flex', 
+								flexDirection:'row', 
+								justifyContent:'flex-end'}} 
+							onPress={() => 
+								setShowModal(false)
+							}/>
+						<IconButton 
+							icon="calendar-edit" 
+							onPress={handleModify} 
+							style={{paddingTop:0, marginVertical: 0, paddingLeft: 260, paddingRight: 0, width: '75%'}}
+						/>
+						<IconButton icon="trash-can-outline" onPress={handleDelete} style={{marginVertical: 0, width: '5%', paddingLeft: 0}} />
+	
+						</View>
+						<View style={{ 
+							display: 'flex',
+							flexDirection: 'row', 
+							justifyContent: 'flex-end',
+							
+							}}>
+					
 						<Text
 				  			style={{		
-								fontSize: 28,
-								padding: 0,
-								paddingVertical: 1,
+								fontSize: 35,
+								paddingRight: 250,
+								paddingBottom: 0,
+								marginBottom: 0,
+								height: 50
 				  			}}
 						>
-							{item.name} {'\n'}	
+							{selectedItem?.name} {'\n'}	
 						</Text>
 
+						</View>
+						<Text
+							style={{
+
+								fontSize: 11
+							}}>
+							{selectedItem?.startTime} - {selectedItem?.endTime}
+							{selectedDate.toLocaleString()}
+						</Text>
 						<Text 
 					style={{
 						alignItems: 'flex-start',
+						fontSize: 11
 					}}
 				>
-					Location: {item.location} {'\n'}
+					Location: {selectedItem?.location} {'\n'}
 						</Text>
 
 						<Text
@@ -249,20 +294,9 @@ const CalendarScreen: React.FC = () => {
 						alignItems: 'flex-start',
 					}}
 				>
-					Description: {item.description} {'\n'}
+					Description: {selectedItem?.description} {'\n'}
 						</Text>
 
-						<Text
-				
-				>
-					Time: {item.startTime} - {item.endTime}
-					{selectedDate.toLocaleString()}
-						</Text>
-					  
-						<TouchableOpacity
-							style={styles.cancelButton} onPress={() => setShowModal(false)}>
-							<Text style={styles.cancelButtonText}>Close</Text>
-					  	</TouchableOpacity>
 					</View>
 			  	</View>
 		  		</Modal>
@@ -289,10 +323,7 @@ const CalendarScreen: React.FC = () => {
                     	<Avatar.Text label="C"/>
                 	</View>
 
-					<View style={{ flexDirection: 'row', justifyContent: 'space-around'}}>
-						<Button title="Modify" onPress={handleModify} />
-						<Button title="Delete" onPress={handleDelete} />
-					</View>
+
             	</Card.Content>
             </Card>
             </TouchableOpacity>
