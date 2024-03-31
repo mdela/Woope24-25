@@ -7,6 +7,7 @@ import {createEvent, modifyEvent, getEvent, getEventOnDate, deleteEvent, getAllE
 router.post('/create', async (req: express.Request, res: express.Response) => {
     const { user_id, title, description, location, startTime, endTime} = req.body;
 
+
     if (!user_id || !title || !description || !location || !startTime || !endTime) {
         return res.status(400).json({ error: 'All fields are required' });
     }
@@ -52,9 +53,10 @@ router.get('/:eventId', async (req: express.Request, res: express.Response) => {
 });
 
 //modify
-router.put('/:eventId', async (req: express.Request, res: express.Response) => {
-    const eventId = parseInt(req.params.eventId);
-    const userId = parseInt(req.body.user_id);
+router.put('/:event_id/:user_id', async (req: express.Request, res: express.Response) => {
+
+    const eventId = parseInt(req.params.event_id);
+    const userId = parseInt(req.params.user_id);
     const { title, description, location, startTime, endTime } = req.body;
 
     if (!eventId || !userId || !title || !description || !location || !startTime || !endTime) {
@@ -62,12 +64,17 @@ router.put('/:eventId', async (req: express.Request, res: express.Response) => {
     }
 
     try {
-        await modifyEvent(eventId, userId, title, description, location, new Date(startTime), new Date(endTime));
-        res.status(200).json({ message: 'Event modified successfully' });
+        const modified = await modifyEvent(eventId, userId, title, description, location, new Date(startTime), new Date(endTime));
+        if (modified) {
+            res.status(200).json({ message: 'Event modified successfully' });
+        } else {
+            res.status(404).json({ error: 'Event not found or not authorized to modify' });
+        }
     } catch (error) {
         res.status(500).json({ error: `Error modifying event: ${(error as Error).message}` });
     }
 });
+
 
 //delete
 router.delete('/:event_id/:user_id',async (req: express.Request, res: express.Response) => {
@@ -96,24 +103,24 @@ router.delete('/:event_id/:user_id',async (req: express.Request, res: express.Re
 
 // get event on specific date
 router.get('/onDate/:selectedDate', async (req: express.Request, res: express.Response) => {
-        // validates that the user's input is in YYYY-MM-DD format
-        const validateDateFormat = /^\d{4}-\d{2}-\d{2}$/;
-        const selectedDate = req.params.selectedDate;
+    // validates that the user's input is in YYYY-MM-DD format
+    const validateDateFormat = /^\d{4}-\d{2}-\d{2}$/;
+    const selectedDate = req.params.selectedDate;
 
-        if(!selectedDate)
-                return res.status(400).json({ error: 'You need to select a specific date.'})
-        else if(!validateDateFormat.test(selectedDate))
-                return res.status(400).json({ error: 'Invalid date format. Please use YYYY-MM-DD format.'})
+    if(!selectedDate)
+        return res.status(400).json({ error: 'You need to select a specific date.'})
+    else if(!validateDateFormat.test(selectedDate))
+        return res.status(400).json({ error: 'Invalid date format. Please use YYYY-MM-DD format.'})
 
-        try {
-            const retrievedEvents = await getEventOnDate(selectedDate);
-            if (retrievedEvents) {
-                res.status(202).json(retrievedEvents);
-            } else {
-                res.status(204).json({message: `No events found on ${selectedDate}`});
-            }
-        } catch (error) {
-            res.status(500).json( { error: `${ (error as Error).message }`})
+    try {
+        const retrievedEvents = await getEventOnDate(selectedDate);
+        if (retrievedEvents) {
+            res.status(202).json(retrievedEvents);
+        } else {
+            res.status(204).json({message: `No events found on ${selectedDate}`});
         }
+    } catch (error) {
+        res.status(500).json( { error: `${ (error as Error).message }`})
+    }
 });
 module.exports = router;

@@ -21,30 +21,35 @@ export const createEvent = async (user_id: number, title: string, description: s
     }
 };
 
-export const modifyEvent = async (event_id: number, user_id: number, title: string, description: string, location: string, start_time: Date, end_time: Date): Promise<void> => {
-    const query =
-        `
-            UPDATE events
-            SET title=$1,
-                description=$2,
-                location=$3,
-                start_time=$4,
-                end_time=$5
-            WHERE event_id = $6
-              AND user_id = $7;
-        `;
+export const modifyEvent = async (
+    event_id: number,
+    user_id: number,
+    title: string,
+    description: string,
+    location: string,
+    start_time: Date,
+    end_time: Date
+): Promise<boolean> => {
+    const query = `
+        UPDATE events
+        SET title = $1,
+            description = $2,
+            location = $3,
+            start_time = $4,
+            end_time = $5
+        WHERE event_id = $6
+          AND user_id = $7;
+    `;
     const values = [title, description, location, start_time, end_time, event_id, user_id];
-
 
     try {
         const result = await pool.query(query, values);
-        if (result.rowCount === 0) {
-            throw new Error("Problem in modifying event!");
-        }
-    } catch(error) {
-            throw new Error((error as Error).message);
-        }
-}
+        return result.rowCount > 0;
+    } catch (error) {
+        throw new Error((error as Error).message);
+    }
+};
+
 
 
 export const getEvent = async (event_id: number): Promise<Event> => {
@@ -82,7 +87,7 @@ export const getEventOnDate = async (selectedDate: string): Promise<Event[]> => 
 }
 
 
-// TODO do we need to validate user_id to current user
+
 export const deleteEvent = async (eventId: number, userId: number): Promise<boolean> => {
     const query = 'DELETE FROM events WHERE event_id = $1 AND user_id = $2';
     const values = [eventId, userId];
