@@ -1,10 +1,10 @@
-export const createEvent = async (userId: number, title: string, description: string, location: string, startTime: Date, endTime: Date) => {
+export const createEvent = async (user_id: number, title: string, description: string, location: string, startTime: string, endTime: string) => {
     const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/calendar/create`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({userId, title, description, location, startTime, endTime}),
+        body: JSON.stringify({user_id, title, description, location, startTime, endTime}),
 
     });
     if (!response.ok) {
@@ -38,13 +38,15 @@ export const deleteEvent = async (eventId: number, userId: number) => {
 }
 
 
-export const modifyEvent = async (eventId: number, userId: number, title: string, description: string, location: string, startTime: Date, endTime: Date) => {
-    const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/calendar/${eventId}`, {
+export const modifyEvent = async (eventId: number, userId: number, title: string, description: string, location: string, startTime: string, endTime: string) => {
+    const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/calendar/${eventId}/${userId}`, {
+
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({eventId ,userId, title, description, location, startTime, endTime}),
+        body: JSON.stringify({title, description, location, startTime, endTime}),
+
     });
 
     if (!response.ok) {
