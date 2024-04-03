@@ -115,3 +115,25 @@ export const getAllEvents = async (): Promise<Event[]> => {
     };
 //-------------------------------------------------
 
+export const getEventsForMonth = async (year: number, month: number): Promise<Event[]> => {
+    // Adjust month to 0-indexed
+    month = month - 1;
+
+    // Calculate the start and end dates of the month
+    const startDate = new Date(year, month, 1);
+    const endDate = new Date(year, month + 1, 0, 23, 59, 59, 999);
+
+    const query = `
+        SELECT event_id, user_id, title, description, location, start_time, end_time, is_active
+        FROM events
+        WHERE start_time >= $1 AND end_time <= $2;
+    `;
+    const values = [startDate.toISOString(), endDate.toISOString()];
+
+    try {
+        const result = await pool.query(query, values);
+        return result.rows;
+    } catch (error) {
+        throw new Error((error as Error).message);
+    }
+};

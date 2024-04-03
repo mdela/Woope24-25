@@ -1,7 +1,7 @@
 import express from 'express';
 import { authenticateToken } from '../middleware/authMiddleware';
 const router = require('express').Router();
-import {createEvent, modifyEvent, getEvent, getEventOnDate, deleteEvent, getAllEvents} from "../models/calendar";
+import {createEvent, modifyEvent, getEvent, getEventOnDate, deleteEvent, getAllEvents, getEventsForMonth} from "../models/calendar";
 
 //createEvent
 router.post('/create', async (req: express.Request, res: express.Response) => {
@@ -124,3 +124,19 @@ router.get('/onDate/:selectedDate', async (req: express.Request, res: express.Re
     }
 });
 module.exports = router;
+
+router.get('/forMonth/:year/:month', async (req: express.Request, res: express.Response) => {
+    const year = parseInt(req.params.year);
+    const month = parseInt(req.params.month);
+
+    if (isNaN(year) || isNaN(month)) {
+        return res.status(400).json({ error: 'Invalid year or month' });
+    }
+
+    try {
+        const events = await getEventsForMonth(year, month);
+        res.status(200).json(events);
+    } catch (error) {
+        res.status(500).json( { error: `${ (error as Error).message }`});
+    }
+});
