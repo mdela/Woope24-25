@@ -1,12 +1,12 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {View, Text, StyleSheet, Modal, TextInput, TouchableOpacity, Dimensions, SafeAreaView} from 'react-native';
+import {View, Text, StyleSheet, Modal, Button, TextInput, TouchableOpacity, Dimensions, SafeAreaView} from 'react-native';
 import {fetchWithToken} from '../util/fetchWithToken';
 import {useIsFocused} from "@react-navigation/native";
 import {AuthContext} from "../util/AuthContext";
 import {Agenda} from 'react-native-calendars'; // Calendar ~EV
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomButton from '../components/CustomButton';
-import { Card, Avatar, Button, IconButton } from 'react-native-paper';
+import { Card, Avatar, IconButton } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 interface Item {
@@ -364,6 +364,32 @@ const CalendarScreen: React.FC = () => {
 			{/* Modal content */}
 			<View style={styles.centeredView}>
 			  <View style={styles.modalView}>
+			  <View style={{
+				flexDirection: 'row',
+				marginTop: 0,
+			  }}>
+			 <TouchableOpacity>
+			  <IconButton 
+							icon="close" 
+							style={{
+								marginVertical: 0, 
+								paddingLeft: 0, 
+								paddingRight: 20,
+								display: 'flex', 
+								flexDirection:'row', 
+							
+								}} 
+							onPress={() => 
+								setModalVisible(false)
+							}/>
+				</TouchableOpacity>
+					
+			  	
+					<TouchableOpacity
+					  style={{paddingLeft: 250}}>
+					  <Button title="Create" onPress={userCreateEvent} />
+					</TouchableOpacity>
+					</View>
 				<TextInput
 				  style={styles.input}
 				  placeholder="Event Name"
@@ -381,7 +407,7 @@ const CalendarScreen: React.FC = () => {
 				/>
 
 				<TextInput
-				  style={styles.input}
+				  style={styles.description}
 				  placeholder="Description"
 				  value={description}
 				  onChangeText={setDescription}
@@ -423,12 +449,6 @@ const CalendarScreen: React.FC = () => {
 					onChange={handleEndTimeChange}
 					format='y-MM-dd h:mm:ss a'
 				/>
-
-				<Button title="Create Event" onPress={userCreateEvent} />
-					<TouchableOpacity
-					  style={styles.cancelButton} onPress={() => setModalVisible(false)}>
-					  <Text style={styles.cancelButtonText}>Cancel / Modify</Text>
-					</TouchableOpacity>
 			  </View>
 			</View>
 		</Modal>
@@ -454,13 +474,13 @@ const CalendarScreen: React.FC = () => {
 		  justifyContent: 'center',
 		  alignItems: 'center',
 		  marginTop: 22,
+		  padding: 10
 		},
 		modalView: {
-		  margin: 20,
 		  backgroundColor: 'white',
 		  borderRadius: 20,
-		  padding: 35,
-		  alignItems: 'center',
+		  padding: 10,
+		  alignItems: 'flex-start',
 		  shadowColor: '#000',
 		  shadowOffset: {
 			width: 0,
@@ -469,13 +489,27 @@ const CalendarScreen: React.FC = () => {
 		  shadowOpacity: 0.25,
 		  shadowRadius: 4,
 		  elevation: 5,
+		  height: 500,
+		  width: 400,
+	
 		},
 		input: {
 		  width: 300,
 		  height: 40,
+		  marginTop: 5,
 		  marginBottom: 12,
 		  borderWidth: 1,
 		  padding: 10,
+
+		},
+		description:{
+			width: 300,
+			height: 70,
+			marginTop: 5,
+			marginBottom: 12,
+			borderWidth: 1,
+			padding: 10,
+  
 		},
 		createButton: {
 		  backgroundColor: '#1E90FF',
