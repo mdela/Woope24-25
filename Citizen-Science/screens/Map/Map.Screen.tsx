@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, SafeAreaView, Dimensions, Image, Modal, TextInput, TouchableOpacity } from 'react-native';
-import MapView, { Marker } from "react-native-maps";
-import { Title } from 'react-native-paper';
+import { Text, View, SafeAreaView, Dimensions, Image, Modal, TextInput, TouchableOpacity } from 'react-native';
+import MapView, { Callout, Marker } from "react-native-maps";
+import { Button, Title } from 'react-native-paper';
 import * as Location from 'expo-location';
 import { mapStyle } from './Map.Style';
+import * as ImagePicker from 'expo-image-picker';
+
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
 const customMarkerImage = require('../../assets/College_marker.png');
+var galleryImage = null;
 
 const markersData = [
   { title: "CSUN Library", description: "", coordinate: { latitude: 34.239958, longitude: -118.529187 } },
-  { title: "BCE College", description: "", coordinate: { latitude: 46.085323, longitude: -100.674631 } },
+  { title: "SBC College", description: "", coordinate: { latitude: 46.085323, longitude: -100.674631 } },
 ];
 
-export const UserMarkersData = [
-];
+export const UserMarkersData = [];
 
 export const MapScreen = () => {
   const [currentLocation, setCurrentLocation] = useState(null);
@@ -24,6 +26,9 @@ export const MapScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [markerTitle, setMarkerTitle] = useState("");
   const [markerDescription, setMarkerDescription] = useState("");
+  const [markerImage, setMarkerImage] = useState("");
+
+
 
   useEffect(() => {
     const getLocation = async () => {        
@@ -51,11 +56,23 @@ export const MapScreen = () => {
     UserMarkersData.push({
       title: markerTitle,
       description: markerDescription,
-      coordinate: markerCoordinate
+      coordinate: markerCoordinate,
+      image: galleryImage,
     });
     setModalVisible(false);
     setMarkerTitle("");
     setMarkerDescription("");
+    setMarkerImage("");
+  };
+
+  const addPictureFromGallery = async () => {
+      let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      quality: 1,
+    });
+    console.log(result);
+    setMarkerImage(result.assets[0].uri);
   };
 
   return (
@@ -82,8 +99,11 @@ export const MapScreen = () => {
               value={markerDescription}
               placeholder="Enter Description"
             />
-            <TouchableOpacity style={mapStyle.button} onPress={addCustomMarker}>
-              <Text style={mapStyle.buttonText}>Add Marker</Text>
+            <TouchableOpacity onPress={addCustomMarker}>
+              <Text>Add Marker</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={addPictureFromGallery}>
+              <Text>Add Picture?</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -114,9 +134,15 @@ export const MapScreen = () => {
               pinColor='plum'
               key={index}
               coordinate={marker.coordinate}
-              title={marker.title}
-              description={marker.description}
             >
+              <Callout tooltip>
+                <View style={mapStyle.bubble}>
+                  <Text>{marker.title}</Text>
+                  <Text>{marker.description}</Text>
+                </View>
+                {markerImage && <Image source={{uri: markerImage}} style={{ width: 50, height: 50 }} />}
+
+              </Callout>
             </Marker>
           ))}
         </MapView>
