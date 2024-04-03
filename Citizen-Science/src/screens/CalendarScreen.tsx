@@ -8,7 +8,7 @@ import {AuthContext} from "../util/AuthContext";
 import {Agenda} from 'react-native-calendars'; // Calendar ~EV
 import { Card, Avatar } from 'react-native-paper';
 import DateTimePicker, {DateTimePickerEvent} from '@react-native-community/datetimepicker';
-import {createEvent, deleteEvent, getEventsOnDate, modifyEvent} from "../api/calendar";
+import {createEvent, deleteEvent, getEventsForMonth, getEventsOnDate, modifyEvent} from "../api/calendar";
 
 
 interface Item {
@@ -79,37 +79,70 @@ const CalendarScreen: React.FC = () => {
 	// }, [isFocused]);
 
 	// Calendar ~EV
-
 	const loadItems = async (day: any) => {
 		if (!day) {
 			return;
 		}
 		try {
-			const dateString = day.dateString; // Format: 'YYYY-MM-DD'
-			const events = await getEventsOnDate(dateString);
-			const newItems: EventItems = { ...items };
+			const year = day.year;
+			const month = day.month;
+			const events = await getEventsForMonth(year, month);
+			const newItems: EventItems = {};
 
-			if (events.length > 0) {
-				newItems[dateString] = events.map((event: any) => ({
+			events.forEach((event: any) => {
+				const eventDate = new Date(event.start_time).toISOString().split('T')[0];
+				if (!newItems[eventDate]) {
+					newItems[eventDate] = [];
+				}
+				newItems[eventDate].push({
 					eventId: event.event_id,
 					name: event.title,
-					date: dateString,
+					date: eventDate,
 					startTime: event.start_time,
 					endTime: event.end_time,
 					location: event.location,
 					description: event.description,
 					height: 100,
-				}));
-			} else {
-
-				newItems[dateString] = [];
-			}
+				});
+			});
 
 			setItems(newItems);
 		} catch (error) {
 			console.error('Error loading events:', error);
 		}
 	};
+
+	const reloadCurrentMonthEvents = async () => {
+		try {
+			const currentYear = new Date().getFullYear();
+			const currentMonth = new Date().getMonth() + 1;
+			const events = await getEventsForMonth(currentYear, currentMonth);
+			const newItems: EventItems = {};
+
+			events.forEach((event: any) => {
+				const eventDate = new Date(event.start_time).toISOString().split('T')[0]; // Extract the date part from the start_time
+				if (!newItems[eventDate]) {
+					newItems[eventDate] = [];
+				}
+				newItems[eventDate].push({
+					eventId: event.event_id,
+					name: event.title,
+					date: eventDate,
+					startTime: event.start_time,
+					endTime: event.end_time,
+					location: event.location,
+					description: event.description,
+					height: 100,
+				});
+			});
+
+			setItems(newItems);
+		} catch (error) {
+			console.error('Error reloading current month events:', error);
+		}
+	};
+
+
 
 
 
@@ -134,7 +167,7 @@ const CalendarScreen: React.FC = () => {
 			setLocation('');
 			setDescription('');
 			setModalVisible(false);
-			loadItems({ dateString: eventDate });
+			await reloadCurrentMonthEvents();
 		} catch (error) {
 			console.error('Error creating event:', error);
 			alert('Error creating event');
@@ -144,9 +177,7 @@ const CalendarScreen: React.FC = () => {
 	const handleDelete = async (eventId: number) => {
 		try {
 			await deleteEvent(eventId, userId);
-			setTimeout(() => {
-				loadItems({ dateString: eventDate });
-			}, 500);
+			await reloadCurrentMonthEvents();
 			alert('Event deleted successfully');
 
 		} catch (error) {
@@ -184,10 +215,8 @@ const CalendarScreen: React.FC = () => {
 				startTime,
 				endTime
 			);
+			await reloadCurrentMonthEvents();
 			alert('Event modified successfully');
-			setTimeout(() => {
-				loadItems({ dateString: eventDate });
-			}, 500);
 
 		} catch (error) {
 			console.error('Error modifying event:', error);
@@ -200,13 +229,6 @@ const CalendarScreen: React.FC = () => {
 		setEventId(null);
 		resetForm();
 	};
-
-
-
-
-
-
-
 
 
 
@@ -352,6 +374,7 @@ const CalendarScreen: React.FC = () => {
 				}}
 
 			/>
+
 
 			<Modal
 				animationType="slide"

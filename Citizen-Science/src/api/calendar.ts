@@ -113,4 +113,21 @@ export const getAllEvents = async () => {
   return await response.json();
 };
 
+export const getEventsForMonth = async (year: number, month: number) => {
+    const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/calendar/forMonth/${year}/${month}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
+    if (!response.ok) {
+        const errorResponse = await response.json();
+        const error = new Error(errorResponse.error || response.statusText);
+        error.name = `HTTP Error ${response.status}`;
+        throw error;
+    }
+
+    return await response.json();
+};
 
