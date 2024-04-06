@@ -414,6 +414,15 @@ const CalendarScreen: React.FC = () => {
 				  placeholderTextColor="darkgray"
 				/>
 				
+				<View style={{
+					flexDirection: 'row',
+				}}>
+
+				
+				<Text style={{paddingTop: 10}}>
+					Start:
+				</Text>
+
 				<DateTimePicker
 					testID="dateTimePicker"
 					value={selectedDate}
@@ -423,10 +432,6 @@ const CalendarScreen: React.FC = () => {
 					onChange={handleDateChange}
 				/>
 
-				<Text>
-					Start Time:
-				</Text>
-
 				<DateTimePicker
 					testID="dateTimePicker"
 					value={eventStartTime}
@@ -435,10 +440,26 @@ const CalendarScreen: React.FC = () => {
 					display="default"
 					onChange={handleStartTimeChange}
 				/>
+				</View>		
 
-				<Text>
-					End Time:
+				<View style={{
+					flexDirection: 'row',
+					paddingTop: 10,
+				}}>
+
+				
+				<Text style={{paddingTop: 10}}>
+					End:
 				</Text>
+				<DateTimePicker
+					testID="dateTimePicker"
+					value={selectedDate}
+					mode="date"
+					is24Hour={true}
+					display="default"
+					onChange={handleDateChange}
+				/>
+
 
 				<DateTimePicker
 					testID="dateTimePicker"
@@ -449,6 +470,7 @@ const CalendarScreen: React.FC = () => {
 					onChange={handleEndTimeChange}
 					format='y-MM-dd h:mm:ss a'
 				/>
+				</View>
 			  </View>
 			</View>
 		</Modal>
