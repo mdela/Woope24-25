@@ -6,7 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 export default function PinPicScreen() {
   const [image, setImage] = useState(null);
 
-  const pickImage = async () => {
+  const pickImage = async () => {                                                           //calls device gallery for images
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,

@@ -11,7 +11,7 @@ import { SMapScreen } from './screens/Map/SMap.Screen';
 import PinPicScreen from './screens/PinPicScreen';
 
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator();                                                                 //navigator
 export default function App() {
   return (
       <NavigationContainer>

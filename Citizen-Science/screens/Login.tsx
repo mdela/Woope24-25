@@ -4,6 +4,8 @@ import {auth} from "../firebase";
 import {createUserWithEmailAndPassword, signInWithEmailAndPassword} from "firebase/auth";
 import {useNavigation} from "@react-navigation/native";
 
+//does not exist in main team branch
+
 const Login = () => {
     const [email, setEmail] = React.useState("");
     const [password, setPassword] = React.useState("");

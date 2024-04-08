@@ -2,6 +2,9 @@ import React from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import {useNavigation} from "@react-navigation/native";
 import {auth} from "../firebase";
+
+//does not exist in main team branch.
+
 const Home = () => {
     const navigator = useNavigation();
 

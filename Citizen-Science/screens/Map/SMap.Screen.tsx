@@ -7,6 +7,8 @@ import { useNavigation } from "@react-navigation/native";
 import { mapStyle } from './Map.Style';
 import { UserMarkersData } from './Map.Screen';
 
+//works the same as Map.Screen.tsx except that no pins can be placed and code is more archaic
+
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
 const customMarkerImage = require('../../assets/College_marker.png');

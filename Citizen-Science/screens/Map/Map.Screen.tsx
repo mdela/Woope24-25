@@ -13,14 +13,14 @@ const windowHeight = Dimensions.get("window").height;
 const customMarkerImage = require('../../assets/College_marker.png');
 
 const markersData = [
-  { title: "CSUN Library", description: "", coordinate: { latitude: 34.239958, longitude: -118.529187 } },
-  { title: "SBC College", description: "", coordinate: { latitude: 46.085323, longitude: -100.674631 } },
+  { title: "CSUN Library", description: "", coordinate: { latitude: 34.239958, longitude: -118.529187 } }, //array containing hard pins
+  { title: "SBC College", description: "", coordinate: { latitude: 46.085323, longitude: -100.674631 } },  //should be switched to db implementation
 ];
 
-interface PinPicScreenProps {
+interface PinPicScreenProps {                                                                              //navigator to pin picture screen
   navigation: any;
 }
-export const UserMarkersData = [];
+export const UserMarkersData = [];                                                                         //array for soft pins. Should be switched to db
 
 export const MapScreen = (props: PinPicScreenProps) => {
   const [currentLocation, setCurrentLocation] = useState(null);
@@ -33,7 +33,7 @@ export const MapScreen = (props: PinPicScreenProps) => {
 
 
 
-  useEffect(() => {
+  useEffect(() => {                                                                                        //gets user's initial map location
     const getLocation = async () => {        
       let location = await Location.getCurrentPositionAsync({});
       setCurrentLocation(location.coords);
@@ -49,13 +49,13 @@ export const MapScreen = (props: PinPicScreenProps) => {
     getLocation();
   }, []);
 
-  const handleMapPress = (event) => {
+  const handleMapPress = (event) => {                                                                     //handles pin placement on press
     const { coordinate } = event.nativeEvent;
     setMarkerCoordinate(coordinate);
     setModalVisible(true);
   };
 
-  const addCustomMarker = () => {
+  const addCustomMarker = () => {                                                                         //works in tandem with above
     UserMarkersData.push({
       title: markerTitle,
       description: markerDescription,
@@ -68,7 +68,7 @@ export const MapScreen = (props: PinPicScreenProps) => {
     setMarkerImage("");
   };
 
-  const addPictureFromGallery = () => props.navigation.navigate("PinPicScreen");
+  const addPictureFromGallery = () => props.navigation.navigate("PinPicScreen");                          //navigates to picture screen
 
   return (
     <SafeAreaView style={mapStyle.flex}>

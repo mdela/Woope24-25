@@ -6,12 +6,12 @@ import * as Location from 'expo-location';
 import React2, {useState, useEffect} from 'react';
 import {HomePage} from './MapHome.Style'
 
-interface MapPageScreenProps {
+interface MapPageScreenProps {                                                                      //allows navigation through screens
     navigation: any;
 }
 
 export const MapHome = (props: MapPageScreenProps) => {
-    const [location, setLocation] =useState({})
+    const [location, setLocation] =useState({})                                                     //gets permissions from user's device
     const getLocation = () => {
         (async() => {
           let {status} = await Location.requestForegroundPermissionsAsync()
@@ -25,7 +25,7 @@ export const MapHome = (props: MapPageScreenProps) => {
           setLocation(loc)
         })()
     };
-    const ViewMap = () => props.navigation.navigate("MapScreen");
+    const ViewMap = () => props.navigation.navigate("MapScreen");                                    //handles navigation
     const ViewSMap = () => props.navigation.navigate("SMapScreen");
 
     return(
