@@ -8,6 +8,7 @@ import * as React from "react";
 import { MapScreen } from './screens/Map/Map.Screen';
 import { MapHome } from './screens/MapHome/MapHome.Screen';
 import { SMapScreen } from './screens/Map/SMap.Screen';
+import PinPicScreen from './screens/PinPicScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -20,6 +21,7 @@ export default function App() {
           <Stack.Screen options={{headerShown: false}} name="MapHome" component={MapHome} />
           <Stack.Screen options={{headerShown: false}} name="MapScreen" component={MapScreen} />
           <Stack.Screen options={{headerShown: false}} name="SMapScreen" component={SMapScreen} />
+          <Stack.Screen options={{headerShown: false}} name="PinPicScreen" component={PinPicScreen} />
         </Stack.Navigator>
       </NavigationContainer>
   );

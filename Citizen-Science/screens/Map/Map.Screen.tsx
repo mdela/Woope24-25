@@ -5,21 +5,24 @@ import { Button, Title } from 'react-native-paper';
 import * as Location from 'expo-location';
 import { mapStyle } from './Map.Style';
 import * as ImagePicker from 'expo-image-picker';
+import PinPicScreen from '../PinPicScreen';
 
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
 const customMarkerImage = require('../../assets/College_marker.png');
-var galleryImage = null;
 
 const markersData = [
   { title: "CSUN Library", description: "", coordinate: { latitude: 34.239958, longitude: -118.529187 } },
   { title: "SBC College", description: "", coordinate: { latitude: 46.085323, longitude: -100.674631 } },
 ];
 
+interface PinPicScreenProps {
+  navigation: any;
+}
 export const UserMarkersData = [];
 
-export const MapScreen = () => {
+export const MapScreen = (props: PinPicScreenProps) => {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [initialRegion, setInitialRegion] = useState(null);
   const [markerCoordinate, setMarkerCoordinate] = useState(null);
@@ -65,15 +68,7 @@ export const MapScreen = () => {
     setMarkerImage("");
   };
 
-  const addPictureFromGallery = async () => {
-      let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      quality: 1,
-    });
-    console.log(result);
-    setMarkerImage(result.assets[0].uri);
-  };
+  const addPictureFromGallery = () => props.navigation.navigate("PinPicScreen");
 
   return (
     <SafeAreaView style={mapStyle.flex}>
@@ -101,9 +96,6 @@ export const MapScreen = () => {
             />
             <TouchableOpacity onPress={addCustomMarker}>
               <Text>Add Marker</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={addPictureFromGallery}>
-              <Text>Add Picture?</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -135,13 +127,12 @@ export const MapScreen = () => {
               key={index}
               coordinate={marker.coordinate}
             >
-              <Callout tooltip>
+              <Callout tooltip onPress = {addPictureFromGallery}>
                 <View style={mapStyle.bubble}>
                   <Text>{marker.title}</Text>
                   <Text>{marker.description}</Text>
+                  <Text style = {{opacity: 0.25}}>Click bubble to add/view picture</Text>
                 </View>
-                {markerImage && <Image source={{uri: markerImage}} style={{ width: 50, height: 50 }} />}
-
               </Callout>
             </Marker>
           ))}
