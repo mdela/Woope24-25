@@ -2,6 +2,11 @@ import { useState } from 'react';
 import { Button, Image, View, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 
+//Plan for future picture to pin connection since MapView does not yet fully support pictures.
+//Get pictures to save on this screen and have each pin have a unique instance of this screen.
+//After picture is selected for pin, display each pins picture here if once has been selected.
+//Otherwise, display button that asks user to add a picture. I have been working on this solo for 3 weeks.
+//Good luck
 
 export default function PinPicScreen() {
   const [image, setImage] = useState(null);
