@@ -7,6 +7,7 @@ services:
         command: npm run dev
         volumes:
             - .:/usr/src/app
+            - ./static/:/app
         environment:
             DB_HOST: 'api-postgres-1'
             DB_PORT: 5432
@@ -28,4 +29,5 @@ services:
             - postgres-data:/var/lib/postgresql/data
 volumes:
     postgres-data:
+    static:
 
