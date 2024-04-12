@@ -30,4 +30,15 @@ router.post('/upload', (req: express.Request, res: express.Response) => {
 
 });
 
+router.get('/download/:filename', (req: express.Request, res: express.Response) => {
+    const filename = req.params.filename;
+    const filePath = path.join(uploadDirectory, filename);
+
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).send('File not found!');
+    }
+
+    res.download(filePath);
+});
+
 module.exports = router;
