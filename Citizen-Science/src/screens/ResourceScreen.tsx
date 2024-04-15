@@ -1,26 +1,52 @@
 import { mdiStairsDown } from '@mdi/js';
-import React from 'react';
-import { View, StyleSheet, ImageBackground, SafeAreaViewComponent, Button } from 'react-native';
-import {Avatar, Surface, Icon, IconButton, Text} from 'react-native-paper';
+import React, {useState} from 'react';
+import { View, StyleSheet, ImageBackground, SafeAreaViewComponent, Button, Modal} from 'react-native';
+import {Avatar, Surface, Icon, IconButton, Text, Card} from 'react-native-paper';
+import { red100 } from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const ResourceScreen = () => {
 
     const image = require('../../assets/csun.png');
 
+    const [modalVisible, setModalVisible] = useState(false);
     return (
         <SafeAreaView>
             
             <View style={styles.containerLeft}>
             
                 <Surface style={styles.surfaceLeft} elevation={4}>
-                    <IconButton style={styles.avatarLeft} icon={'home'}></IconButton>
+                    <IconButton 
+                        style={styles.avatarLeft} icon={'home'}
+                        onPress={() => setModalVisible(true)}
+                    ></IconButton>
                     
                 </Surface>
                 <View>
                 <Text style={styles.text} variant="displayLarge">Display Large</Text>
                 </View>
                 
+                <View>
+                    <Modal 
+                        visible={modalVisible}
+                        onDismiss={() => setModalVisible(false)}
+                    
+
+                    >
+                        <View style={styles.centeredView}>
+                            <View style={styles.modalView}>
+                               <Card>
+                                    <Card.Content>
+                                        <View>
+                                            <Text>Testing</Text>
+                                        </View>
+                                    </Card.Content>
+                               </Card>
+                            </View>
+                        </View>
+                    </Modal>
+
+                </View>
                 
 
                 <Surface style={styles.surfaceLeft} elevation={4}>
@@ -122,6 +148,20 @@ const styles = StyleSheet.create({
         marginLeft: 100,
         paddingTop: 150,
         paddingLeft: 150,
+      },
+      centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
+      },
+      modalView: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 25,
+        alignItems: 'center',
+
       },
 });
 
