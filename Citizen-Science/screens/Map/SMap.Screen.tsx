@@ -7,7 +7,9 @@ import { useNavigation } from "@react-navigation/native";
 import { mapStyle } from './Map.Style';
 import { UserMarkersData } from './Map.Screen';
 
-//works the same as Map.Screen.tsx except that no pins can be placed and code is more archaic
+//works the same as Map.Screen.tsx except that no pins can be placed and code is more archaic.
+//is obsolete as of 4/17/24
+//will leave for future testing
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
