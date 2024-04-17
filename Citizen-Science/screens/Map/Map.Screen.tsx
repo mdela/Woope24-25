@@ -7,10 +7,11 @@ import { mapStyle } from './Map.Style';
 import * as ImagePicker from 'expo-image-picker';
 import PinPicScreen from '../PinPicScreen';
 
-
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
 const customMarkerImage = require('../../assets/College_marker.png');
+
+var MarkerIndex = 0;
 
 const markersData = [
   { title: "CSUN Library", description: "", coordinate: { latitude: 34.239958, longitude: -118.529187 } }, //array containing hard pins
@@ -55,13 +56,14 @@ export const MapScreen = (props: PinPicScreenProps) => {
     setModalVisible(true);
   };
 
-  const addCustomMarker = () => {                                                                         //works in tandem with above
+  const addCustomMarker = () => {                                                                         //works in tandem with above. Also saves soft pins to local array
     UserMarkersData.push({
       title: markerTitle,
       description: markerDescription,
       coordinate: markerCoordinate,
-      image: galleryImage,
+      index: MarkerIndex,
     });
+    MarkerIndex++;
     setModalVisible(false);
     setMarkerTitle("");
     setMarkerDescription("");
