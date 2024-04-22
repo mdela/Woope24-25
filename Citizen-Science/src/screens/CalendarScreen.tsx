@@ -24,15 +24,6 @@ eventId: number;
 interface EventItems {
 	[date: string]: Item[];
 }
-// type Event = {
-//     name: string;
-//     date: string;
-//     height: number;
-//     startTime: string;
-// 	endTime: string;
-//     location: string;
-// 	description: string;
-// };
 
 
 const CalendarScreen: React.FC = () => {
@@ -59,26 +50,6 @@ const [isModifying, setIsModifying] = useState(false);
 	const [eventId, setEventId] = useState<number | null>(null);
 
 
-
-
-	//If this is not needed for backend it can be deleted
-	// TODO Uncomment when implementing backend
-	// testing fetchWithToken
-	// useEffect(() => {
-	// 	if (isFocused) {
-	// 		const fetchData = async () => {
-	// 			const { response, newAccessToken, tokenRefreshFailed } = await fetchWithToken(`${process.env.EXPO_PUBLIC_API_URL}/health/protected-route`);
-	// 			if (newAccessToken && newAccessToken !== userToken) {
-	// 				setUserToken(newAccessToken);
-	// 			} else if (tokenRefreshFailed) {
-	// 				setUserToken(null);
-	// 			}
-	// 		};
-	// 		fetchData();
-	// 	}
-	// }, [isFocused]);
-
-	// Calendar ~EV
 	const loadItems = async (day: any) => {
 		if (!day) {
 			return;
@@ -380,8 +351,9 @@ const handleDelete = async (eventId: number) => {
 
 								fontSize: 11
 							}}>
-							{selectedItem?.startTime} - {selectedItem?.endTime}
-							{selectedDate.toLocaleString()}
+						
+							{formatTime(selectedItem?.startTime)} - {formatTime(selectedItem?.endTime)}
+						
 						</Text>
 						<Text 
 					style={{
@@ -414,11 +386,10 @@ const handleDelete = async (eventId: number) => {
 					<Text style={{ fontWeight: 'bold' }}>
                         {item.name} {'\n'}
 						<Text style={{ fontSize: 12, fontWeight: 'normal' }}>
-                            Start: {formatTime(item.startTime)} {'\n'}
+                        	{formatTime(item.startTime)}  - {formatTime(item.endTime)} {'\n'}
                         </Text>
-						<Text style={{ fontSize: 12, fontWeight: 'normal' }}>
-                            End: {formatTime(item.endTime)} {'\n'}
-                        </Text>
+						
+                    
                         
 								<Text style={{ fontSize: 12, fontWeight: 'normal', fontStyle: 'italic' }}>
                             {item.location}
@@ -531,11 +502,12 @@ const renderItem = (item: Item) => {
 				
 				<View style={{
 					flexDirection: 'row',
+					padding: 0
 				}}>
 
 				
-				<Text style={{paddingTop: 10}}>
-					Start:
+				<Text style={{paddingTop: 10, paddingRight: 0, margin: 0}}>
+					Time:
 				</Text>
 
 				<DateTimePicker
@@ -546,6 +518,8 @@ const renderItem = (item: Item) => {
 					display="default"
 					onChange={handleDateChange}
 				/>
+				
+
 
 				<DateTimePicker
 					testID="dateTimePicker"
@@ -555,27 +529,10 @@ const renderItem = (item: Item) => {
 					display="default"
 					onChange={handleStartTimeChange}
 				/>
-				</View>		
 
-				<View style={{
-					flexDirection: 'row',
-					paddingTop: 10,
-				}}>
-
-				
-				<Text style={{paddingTop: 10}}>
-					End:
+				<Text style={{paddingTop: 10, paddingLeft: 5}}>
+					-
 				</Text>
-				<DateTimePicker
-					testID="dateTimePicker"
-					value={selectedDate}
-					mode="date"
-					is24Hour={true}
-					display="default"
-					onChange={handleDateChange}
-				/>
-
-
 				<DateTimePicker
 					testID="dateTimePicker"
 					value={eventEndTime}
@@ -585,7 +542,13 @@ const renderItem = (item: Item) => {
 					onChange={handleEndTimeChange}
 					format='y-MM-dd h:mm:ss a'
 				/>
-				</View>
+				</View>		
+
+
+
+
+
+				
 			  </View>
 			</View>
 		</Modal>
