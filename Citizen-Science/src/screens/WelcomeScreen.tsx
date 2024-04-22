@@ -52,7 +52,7 @@ const WelcomeScreen: React.FC = () => {
 
             {/* 'Welcome' title */}
             <ScreenTitle
-                text={'Welcome'}
+                text={'Taŋyáŋ yahi'}
                 textStyle={'title'}
                 fontSize={4}
                 color={'white'}
@@ -62,7 +62,7 @@ const WelcomeScreen: React.FC = () => {
 
             {/* 'Welcome' subtitle in Lakota language */}
             <ScreenTitle
-                text={'(taŋyáŋ yah)'}
+                text={'(Welcome)'}
                 textStyle={'subtitle'}
                 fontSize={2}
                 color={'white'}

@@ -59,7 +59,7 @@ export const SMapScreen = () => {
 					</Marker>
 					<Marker                                                       //hard pin
 						coordinate={{latitude: 46.085323, longitude: -100.674631}}
-						title="BCE College">
+						title="SBC College">
 					</Marker>
 				</MapView>
 			)}

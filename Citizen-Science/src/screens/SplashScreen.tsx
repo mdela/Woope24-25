@@ -18,7 +18,7 @@ function SplashScreen() {
                     routes: [{ name: 'Welcome' }],
                 })
             );
-        }, 2000);
+        }, 9500);
 
         return () => clearTimeout(splashTimer); // This will cancel our splash screen after 2 seconds
     }, []);

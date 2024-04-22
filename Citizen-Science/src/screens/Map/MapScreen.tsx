@@ -10,7 +10,7 @@ const customMarkerImage = require('../../../assets/College_marker.png');
 
 const markersData = [
 	{ title: "CSUN Library", coordinate: { latitude: 34.239958, longitude: -118.529187 } },
-	{ title: "BCE College", coordinate: { latitude: 46.085323, longitude: -100.674631 } },
+	{ title: "SBC College", coordinate: { latitude: 46.085323, longitude: -100.674631 } },
 ];
 
 interface Location {
