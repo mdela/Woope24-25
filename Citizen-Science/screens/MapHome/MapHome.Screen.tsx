@@ -1,12 +1,14 @@
 import React from 'react';
-import { SafeAreaView, ScrollView, View } from 'react-native';
+import { SafeAreaView, ScrollView, View, Image, Text } from 'react-native';
 import {Appbar} from 'react-native-paper';
 import {Card, Button, TextInput} from 'react-native-paper';
 import * as Location from 'expo-location';
 import React2, {useState, useEffect} from 'react';
 import {HomePage} from './MapHome.Style'
 import MapView, { Callout, Marker } from "react-native-maps";
+import { UserMarkersData, markersData } from '../Map/Map.Screen';
 
+const customMarkerImage = require('../../assets/College_marker.png');
 interface MapPageScreenProps {                                                                      //allows navigation through screens
     navigation: any;
 }
@@ -64,6 +66,30 @@ export const MapHome = (props: MapPageScreenProps) => {
                             title="Your Location"
                             />
                         )}
+                      {markersData.map((marker, index) => (
+                        <Marker
+                          key={index}
+                          coordinate={marker.coordinate}
+                          title={marker.title}
+                          description={marker.description}
+                          >
+                          <Image source={customMarkerImage} style={{ width: 30, height: 30 }} />
+                        </Marker>
+                      ))}
+                    {UserMarkersData.map((marker, index) => (
+                      <Marker
+                          pinColor='plum'
+                          key={index}
+                          coordinate={marker.coordinate}
+                        >
+                        <Callout>
+                          <View style={HomePage.bubble}>
+                            <Text>{marker.title}</Text>
+                            <Text>{marker.description}</Text>
+                          </View>
+                        </Callout>
+                      </Marker>
+                    ))}
                     </MapView>
                     <Button style = {HomePage.button}
                         buttonColor='#0810F6'

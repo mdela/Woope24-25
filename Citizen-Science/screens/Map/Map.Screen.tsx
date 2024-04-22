@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, SafeAreaView, Dimensions, Image, Modal, TextInput, TouchableOpacity } from 'react-native';
 import MapView, { Callout, Marker } from "react-native-maps";
-import { Button, Title } from 'react-native-paper';
+import { Button, Title, IconButton } from 'react-native-paper';
 import * as Location from 'expo-location';
 import { mapStyle } from './Map.Style';
 import * as ImagePicker from 'expo-image-picker';
 import PinPicScreen from '../PinPicScreen';
+import { MapHome } from '../MapHome/MapHome.Screen';
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
 const customMarkerImage = require('../../assets/College_marker.png');
+const backArrowImage = require('../../assets/step-backward.png');
+
 
 var MarkerIndex = 0;
 
-const markersData = [
+export const markersData = [
   { title: "CSUN Library", description: "", coordinate: { latitude: 34.239958, longitude: -118.529187 } }, //array containing hard pins
   { title: "SBC College", description: "", coordinate: { latitude: 46.085323, longitude: -100.674631 } },  //should be switched to db implementation
 ];
@@ -71,6 +74,9 @@ export const MapScreen = (props: PinPicScreenProps) => {
   };
 
   const addPictureFromGallery = () => props.navigation.navigate("PinPicScreen");                          //navigates to picture screen
+
+  const returnToMapHome = () => props.navigation.navigate("MapHome");                                     //navigates back to MapHome screen
+
 
   return (
     <SafeAreaView style={mapStyle.flex}>
@@ -140,6 +146,9 @@ export const MapScreen = (props: PinPicScreenProps) => {
           ))}
         </MapView>
       )}
+          <View>            
+            <Button onPress = {returnToMapHome} style = {mapStyle.buttonCallout} icon = {backArrowImage}/>
+          </View>
     </SafeAreaView>
   );
 }

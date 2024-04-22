@@ -25,4 +25,14 @@ export const HomePage = StyleSheet.create({
         width: "90%",
         height: "90%",
       },
+      bubble: {
+        flexDirection: 'column',
+        alignSelf: 'flex-start',
+        backgroundColor: '#fff',
+        borderRadius: 6,
+        borderColor: '#ccc',
+        borderWidth: 0.5,
+        padding: 15,
+        width: 150,
+      },
 })
