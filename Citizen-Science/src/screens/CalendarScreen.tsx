@@ -346,15 +346,11 @@ const handleDelete = async (eventId: number) => {
 						</Text>
 
 						</View>
-						<Text
-							style={{
-
-								fontSize: 11
-							}}>
-						
-							{formatTime(selectedItem?.startTime)} - {formatTime(selectedItem?.endTime)}
-						
-						</Text>
+						{selectedItem && (
+   							 <Text style={{ fontSize: 11 }}>
+       							 {formatTime(selectedItem.startTime)} - {formatTime(selectedItem.endTime)}
+    						</Text>
+)}
 						<Text 
 					style={{
 						alignItems: 'flex-start',
