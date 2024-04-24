@@ -37,7 +37,9 @@ const { userToken, setUserToken } = useContext(AuthContext);
 	const [eventDate, setEventDate] = useState('');
 	const now = new Date();
 	const localMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
 	const [selectedDate, setSelectedDate] = useState(localMidnight);
+
 	const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 	const [eventStartTime, setEventStartTime] = useState(new Date());
 	const [startTime, setStartTime] = useState('');
@@ -158,17 +160,30 @@ const handleDelete = async (eventId: number) => {
 	};
 
 	const handleModify = (item: Item) => {
-		setIsModifying(true);
+		// console.log("Modifying event with Date:", item.date);
+		// console.log("Modifying event with Date:", item.startTime);
+		// console.log("Modifying event with Date:", item.endTime);
+
+
 		setEventId(item.eventId);
 		setEventName(item.name);
 		setLocation(item.location);
 		setDescription(item.description);
+
+		console.log("Setting date in handleModify:", new Date(item.date));
+
 		setSelectedDate(new Date(item.date));
 		setStartTime(item.startTime);
 		setEndTime(item.endTime);
 
-		setModalVisible(true);
+
+		setTimeout(() => {
+			setShowModal(false);
+			setIsModifying(true);
+			setModalVisible(true);
+		}, 0);
 	};
+
 
 	const submitEventModification = async () => {
 		if (eventId === null) {
@@ -188,13 +203,13 @@ const handleDelete = async (eventId: number) => {
 			);
 			await reloadCurrentMonthEvents();
 			alert('Event modified successfully');
-
 		} catch (error) {
 			console.error('Error modifying event:', error);
 			alert('Error modifying event');
+			return; // Ensure not to proceed with state resets if there's an error
 		}
 
-
+		// Close and reset everything after successful modification
 		setIsModifying(false);
 		setModalVisible(false);
 		setEventId(null);
@@ -203,14 +218,14 @@ const handleDelete = async (eventId: number) => {
 
 
 
-	const handleDateChange = (event: any, selectedDate: Date) => {
-		if (selectedDate !== undefined) {
-			const year = selectedDate.getFullYear();
-			const month = ("0" + (selectedDate.getMonth() + 1)).slice(-2);
-			const day = ("0" + selectedDate.getDate()).slice(-2);
-			setEventDate(`${year}-${month}-${day}`);
-			setSelectedDate(selectedDate);
-		}
+	const resetForm = () => {
+		setEventName('');
+		setLocation('');
+		setDescription('');
+		setSelectedDate(new Date());
+		setStartTime('');
+		setEndTime('');
+		setIsModifying(false);
 	};
 
 	const formatDateAndTime = (date: Date, time: Date) => {
@@ -220,10 +235,25 @@ const handleDelete = async (eventId: number) => {
 		const hours = ("0" + time.getHours()).slice(-2);
 		const minutes = ("0" + time.getMinutes()).slice(-2);
 		const seconds = ("0" + time.getSeconds()).slice(-2);
-	
+
 		return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
 	};
-	
+
+
+
+	const handleDateChange = (event: any, selectedDate?: Date) => {
+		if (selectedDate) {
+			const year = selectedDate.getFullYear();
+			const month = ("0" + (selectedDate.getMonth() + 1)).slice(-2);
+			const day = ("0" + selectedDate.getDate()).slice(-2);
+			setEventDate(`${year}-${month}-${day}`);
+			setSelectedDate(selectedDate);
+		}
+	};
+
+
+
+
 	const handleStartTimeChange = (event: any, selectedTime?: Date) => {
 		if (selectedTime) {
 			setEventStartTime(selectedTime);
@@ -252,19 +282,6 @@ const handleDelete = async (eventId: number) => {
 		hours = hours || 12;
 		const minutesStr = minutes < 10 ? `0${minutes}` : minutes;
 		return `${hours}:${minutesStr} ${ampm}`;
-	};
-
-
-
-
-	const resetForm = () => {
-		setEventName('');
-		setLocation('');
-		setDescription('');
-		setSelectedDate(new Date());
-		setStartTime('');
-		setEndTime('');
-		setIsModifying(false);
 	};
 
 
@@ -320,10 +337,10 @@ const handleDelete = async (eventId: number) => {
 							}/>
 						<IconButton 
 							icon="calendar-edit" 
-							onPress={handleModify} 
+							onPress={() => handleModify(item)}
 							style={{paddingTop:0, marginVertical: 0, paddingLeft: 260, paddingRight: 0, width: '75%'}}
 						/>
-						<IconButton icon="trash-can-outline" onPress={handleDelete} style={{marginVertical: 0, width: '5%', paddingLeft: 0}} />
+						<IconButton icon="trash-can-outline" onPress={() => handleDelete(item.eventId)} style={{marginVertical: 0, width: '5%', paddingLeft: 0}} />
 	
 						</View>
 						<View style={{ 
@@ -435,120 +452,91 @@ const renderItem = (item: Item) => {
 
 		  />
 
-		<Modal
-			animationType="slide"
-			transparent={true}
-			visible={modalVisible}
-			onRequestClose={() => {
-			  setModalVisible(false);
-			}}
-		  >
-			{/* Modal content */}
-			<View style={styles.centeredView}>
-			  <View style={styles.modalView}>
-			  <View style={{
-				flexDirection: 'row',
-				marginTop: 0,
-			  }}>
-			 <TouchableOpacity>
-			  <IconButton 
-							icon="close" 
-							style={{
-								marginVertical: 0, 
-								paddingLeft: 0, 
-								paddingRight: 20,
-								display: 'flex', 
-								flexDirection:'row', 
-							
-								}} 
-							onPress={() => 
-								setModalVisible(false)
-							}/>
-				</TouchableOpacity>
-					
-			  	
-					<TouchableOpacity
-					  style={{paddingLeft: 250}}>
-					  <Button title="Create" onPress={userCreateEvent} />
-					</TouchableOpacity>
+			<Modal
+				animationType="slide"
+				transparent={true}
+				visible={modalVisible}
+				onRequestClose={() => {
+					setModalVisible(false);
+					setIsModifying(false); // Reset modifying state on close
+				}}
+			>
+				<View style={styles.centeredView}>
+					<View style={styles.modalView}>
+						<View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 0 }}>
+							<IconButton
+								icon="close"
+								onPress={() => {
+									setModalVisible(false);
+									setIsModifying(false);
+								}}
+							/>
+							{isModifying ? (
+								<Button title="Save Changes" onPress={submitEventModification} />
+							) : (
+								<Button title="Create" onPress={userCreateEvent} />
+							)}
+						</View>
+
+						<TextInput
+							style={styles.input}
+							placeholder="Event Name"
+							value={eventName}
+							onChangeText={setEventName}
+							placeholderTextColor={'darkgray'}
+						/>
+
+						<TextInput
+							style={styles.input}
+							placeholder="Set Location"
+							value={location}
+							onChangeText={setLocation}
+							placeholderTextColor="darkgray"
+						/>
+
+						<TextInput
+							style={styles.description}
+							placeholder="Description"
+							value={description}
+							onChangeText={setDescription}
+							placeholderTextColor="darkgray"
+						/>
+
+						<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+							<Text>Time:</Text>
+							<DateTimePicker
+								testID="dateTimePicker"
+								value={selectedDate}
+								mode="date"
+								is24Hour={true}
+								display="default"
+								onChange={handleDateChange}
+							/>
+							<DateTimePicker
+								testID="dateTimePicker"
+								value={eventStartTime}
+								mode="time"
+								is24Hour={true}
+								display="default"
+								onChange={handleStartTimeChange}
+							/>
+							<Text> - </Text>
+							<DateTimePicker
+								testID="dateTimePicker"
+								value={eventEndTime}
+								mode="time"
+								is24Hour={true}
+								display="default"
+								onChange={handleEndTimeChange}
+							/>
+						</View>
 					</View>
-				<TextInput
-				  style={styles.input}
-				  placeholder="Event Name"
-				  value={eventName}
-				  onChangeText={setEventName}
-				  placeholderTextColor={'darkgray'}
-				/>
-				
-				<TextInput
-				  style={styles.input}
-				  placeholder="Set Location"
-				  value={location}
-				  onChangeText={setLocation}
-				  placeholderTextColor="darkgray"
-				/>
-
-				<TextInput
-				  style={styles.description}
-				  placeholder="Description"
-				  value={description}
-				  onChangeText={setDescription}
-				  placeholderTextColor="darkgray"
-				/>
-				
-				<View style={{
-					flexDirection: 'row',
-					padding: 0
-				}}>
-
-				
-				<Text style={{paddingTop: 10, paddingRight: 0, margin: 0}}>
-					Time:
-				</Text>
-
-				<DateTimePicker
-					testID="dateTimePicker"
-					value={selectedDate}
-					mode="date"
-					is24Hour={true}
-					display="default"
-					onChange={handleDateChange}
-				/>
-				
-
-
-				<DateTimePicker
-					testID="dateTimePicker"
-					value={eventStartTime}
-					mode="time"
-					is24Hour={true}
-					display="default"
-					onChange={handleStartTimeChange}
-				/>
-
-				<Text style={{paddingTop: 10, paddingLeft: 5}}>
-					-
-				</Text>
-				<DateTimePicker
-					testID="dateTimePicker"
-					value={eventEndTime}
-					mode="time"
-					is24Hour={true}
-					display="default"
-					onChange={handleEndTimeChange}
-					format='y-MM-dd h:mm:ss a'
-				/>
-				</View>		
+				</View>
+			</Modal>
 
 
 
-
-
-				
-			  </View>
-			</View>
-		</Modal>
-		{!modalVisible && (
+			{!modalVisible && (
 			<TouchableOpacity
 				style={styles.createButton}
 				onPress={() => setModalVisible(true)}
