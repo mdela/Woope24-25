@@ -5,12 +5,16 @@ import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
 import { Picker } from '@react-native-picker/picker';
 
-const App = () => {
+interface AddPinScreenProps {                                                                      //allows navigation through screens
+  navigation: any;
+}
+
+export const AddPin = (props: AddPinScreenProps) => {                                           //allows navigation through screens 
   const [longitude, setLongitude] = useState('');
   const [latitude, setLatitude] = useState('');
   const [locationName, setLocationName] = useState('');
   const [locationDetails, setLocationDetails] = useState('');
-  const [pinType, setPinType] = useState('hazard'); // Sets the default pin type to hazard
+  const [pinType, setPinType] = useState('hazard');  // Sets the default pin type to hazard
   const [image, setImage] = useState(null);
 
   //First checks for camera and GPS permissions and requests them as needed
@@ -62,111 +66,47 @@ const App = () => {
     }
   };
 
-//Requests permissiono for Gallery
-  const pickImage = async () => {
+const pickImage = async () => {
     const { status } = await MediaLibrary.getPermissionsAsync();
     if (status !== 'granted') {
-      const { status: newStatus } = await MediaLibrary.requestPermissionsAsync();
-      if (newStatus !== 'granted') {
-        alert('Permission to access media library is required!');
-        return;
-      }
+    const { status: newStatus } = await MediaLibrary.requestPermissionsAsync();
+    if (newStatus !== 'granted') {
+      alert('Permission to access media library is required!');
+      return;
+    }
+  }
+
+  let result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.All,
+    allowsEditing: false,
+    aspect: [4, 3],
+    quality: 1,
+    exif: true, // Enable EXIF data retrieval
+  });
+
+  if (!result.cancelled) {
+
+    const imageUri = result.assets[0].uri;; // Access the image URI directly
+    console.log("Self Image URI ", imageUri);
+
+    // Check if EXIF data is available in the result
+    // if (result.exif) {
+    //   console.log("EXIF Data:", result.exif);
+    // } else {
+    //   console.log("No EXIF data available.");
+    // }
+
+    const assetInfo = await MediaLibrary.getAssetInfoAsync(imageUri);
+     if (assetInfo) {
+       console.log("Media Library EXIF Data:", assetInfo.exif);
+     } else {
+       console.log("Failed to retrieve asset information.");
     }
   
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: false,
-      aspect: [4, 3],
-      quality: 1,
-      exif: true, //Enables access to EXIF data
-      base64: true, // Load the encoded base64 entire image
-    });
-  
-    if (!result.cancelled) {
-      const imageBase64 = result.assets[0].base64; // Access the base64-encoded image data
-  
-      console.log("Self Image Base64 ", imageBase64);
-  
-      // Convert base64-encoded image data to binary data
-      const binaryImageData = Buffer.from(imageBase64, 'base64');
-  
-      // Now you can process the binaryImageData, including extracting EXIF data if available
-      const exifData = extractExifData(binaryImageData);
-   
-      setImage(imageBase64); // Alternatively, set the image data to the state or perform further processing
-  
-      // Note: Loading the entire image as base64-encoded data can increase memory usage and may not be suitable for large images.
+      setImage(imageUri);
+    
     }
   };
-
-  // const pickImage = async () => {
-  //   const { status } = await MediaLibrary.getPermissionsAsync();
-  // if (status !== 'granted') {
-  //   const { status: newStatus } = await MediaLibrary.requestPermissionsAsync();
-  //   if (newStatus !== 'granted') {
-  //     alert('Permission to access media library is required!');
-  //     return;
-  //   }
-  // }
-
-  // let result = await ImagePicker.launchImageLibraryAsync({
-  //   mediaTypes: ImagePicker.MediaTypeOptions.All,
-  //   allowsEditing: false,
-  //   aspect: [4, 3],
-  //   quality: 1,
-  //   exif: true, // Enable EXIF data retrieval
-  // });
-
-  // if (!result.cancelled) {
-
-  //   const imageUri = result.assets[0].uri;; // Access the image URI directly
-  //   console.log("Self Image URI ", imageUri);
-
-  //   // Check if EXIF data is available in the result
-  //   // if (result.exif) {
-  //   //   console.log("EXIF Data:", result.exif);
-  //   // } else {
-  //   //   console.log("No EXIF data available.");
-  //   // }
-
-  //   const assetInfo = await MediaLibrary.getAssetInfoAsync(imageUri);
-  //    if (assetInfo) {
-  //      console.log("Media Library EXIF Data:", assetInfo.exif);
-  //    } else {
-  //      console.log("Failed to retrieve asset information.");
-  //   }
-  
-  //     setImage(imageUri);
-    
-  //   }
-  // };
-
-
-  // const pickImage = async () => {
-  //   const permissionGranted = await requestCameraPermission();
-  //   if (!permissionGranted) return;
-
-  //   let result = await ImagePicker.launchImageLibraryAsync({
-  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
-  //     allowsEditing: false,
-  //     aspect: [4, 3],
-  //     quality: 1,
-  //     exif:true,
-  //   });
-
-  //  // console.log(result.assets[0].uri);
-  //   console.log(result.exif);
-
-  //   if (!result.cancelled) {
-  //     setImage(result.assets[0].uri);
-  //     console.log(result.assets[0].uri);
-  //   }
-  // };
-
-  //Function meant to 
-  function extractExifData(binaryImageData: any) {
-    throw new Error('Function not implemented.');
-  }
 
   //Screen layout (Image,Buttons and Piker)
   return (
@@ -275,4 +215,3 @@ const styles = StyleSheet.create({
         
   },
 });
-

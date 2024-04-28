@@ -17,7 +17,11 @@ const Home = () => {
     }
 
     const ToMap = () => {
-            navigator.navigate("MapHome");
+        navigator.navigate("MapHome");
+    }
+
+    const ToPinCreation = () => {
+        navigator.navigate("AddPin");
     }
 
   return (
@@ -34,6 +38,12 @@ const Home = () => {
         style={styles.button}
     >
         <Text style={styles.buttonText}>Map section</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+        onPress={ToPinCreation}
+        style={styles.button}
+    >
+        <Text style={styles.buttonText}>Add Pin</Text>
     </TouchableOpacity>
     </View>
   );

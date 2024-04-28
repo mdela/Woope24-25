@@ -12,6 +12,7 @@ interface MapPageScreenProps {                                                  
 
 export const MapHome = (props: MapPageScreenProps) => {
     const [location, setLocation] =useState({})                                                     //gets permissions from user's device
+
     const getLocation = () => {
         (async() => {
           let {status} = await Location.requestForegroundPermissionsAsync()
@@ -27,6 +28,7 @@ export const MapHome = (props: MapPageScreenProps) => {
     };
     const ViewMap = () => props.navigation.navigate("MapScreen");                                    //handles navigation
     const ViewSMap = () => props.navigation.navigate("SMapScreen");
+    const AddPin = () => props.navigation.navigate("AddPin");
 
     return(
         <SafeAreaView style = {HomePage.content}>
@@ -50,6 +52,13 @@ export const MapHome = (props: MapPageScreenProps) => {
                         ViewSMap();
                        }}
                     >View Map</Button>
+                    <Button 
+                    mode="contained"
+                    onPress={() => {
+                        Location.requestForegroundPermissionsAsync();
+                        AddPin();
+                       }}
+                    >Add Pin</Button>
                 </Card.Content>
             </Card>
             </ScrollView>

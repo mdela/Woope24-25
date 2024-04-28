@@ -1,14 +1,15 @@
+import * as React from "react";
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from "./screens/Login";
 import Home from "./screens/Home";
-import * as React from "react";
 import { MapScreen } from './screens/Map/Map.Screen';
 import { MapHome } from './screens/MapHome/MapHome.Screen';
 import { SMapScreen } from './screens/Map/SMap.Screen';
 import PinPicScreen from './screens/PinPicScreen';
+import { AddPin } from "./screens/AddPinScreen";
 
 
 const Stack = createNativeStackNavigator();                                                                 //navigator
@@ -22,6 +23,7 @@ export default function App() {
           <Stack.Screen options={{headerShown: false}} name="MapScreen" component={MapScreen} />
           <Stack.Screen options={{headerShown: false}} name="SMapScreen" component={SMapScreen} />
           <Stack.Screen options={{headerShown: false}} name="PinPicScreen" component={PinPicScreen} />
+          <Stack.Screen options={{headerShown: false}} name="AddPin" component={AddPin} />
         </Stack.Navigator>
       </NavigationContainer>
   );
