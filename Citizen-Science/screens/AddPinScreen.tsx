@@ -84,7 +84,7 @@ const pickImage = async () => {
     exif: true, // Enable EXIF data retrieval
   });
 
-  if (!result.cancelled) {
+  if (!result.canceled) {
 
     const imageUri = result.assets[0].uri;; // Access the image URI directly
     console.log("Self Image URI ", imageUri);
