@@ -4,6 +4,8 @@ import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
 import { Picker } from '@react-native-picker/picker';
+import { Camera } from 'expo-camera';
+import MapCamera from './MapCamera';
 
 interface AddPinScreenProps {                                                                      //allows navigation through screens
   navigation: any;
@@ -157,6 +159,11 @@ const pickImage = async () => {
         onPress={getLocation}
         style={styles.button}
       />
+      <Button
+        title="Take Picture"
+        onPress={MapCamera}
+        style={styles.button}
+      />      
       <Button 
         title="Pick an image from camera roll" 
         style={styles.button}
