@@ -5,7 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
 import { Picker } from '@react-native-picker/picker';
 import { Camera } from 'expo-camera';
-import MapCamera from './MapCamera';
+import MapCamera from './MapCameraScreen';
 
 interface AddPinScreenProps {                                                                      //allows navigation through screens
   navigation: any;
