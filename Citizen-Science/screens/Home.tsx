@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import {useNavigation} from "@react-navigation/native";
 import {auth} from "../firebase";
 
+
 //does not exist in main team branch.
 
 const Home = () => {
@@ -20,6 +21,10 @@ const Home = () => {
             navigator.navigate("MapHome");
     }
 
+    const ToPinCreation = () => {
+        navigator.navigate("AddPin");
+    }
+
   return (
     <View style={styles.container}>
         <Text>Email: {auth.currentUser?.email}</Text>
@@ -34,6 +39,12 @@ const Home = () => {
         style={styles.button}
     >
         <Text style={styles.buttonText}>Map section</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+        onPress={ToPinCreation}
+        style={styles.button}
+    >
+        <Text style={styles.buttonText}>Add Pin</Text>
     </TouchableOpacity>
     </View>
   );
