@@ -25,6 +25,10 @@ const Home = () => {
         navigator.navigate("AddPin");
     }
 
+    const ToMapCamera = () => {
+        navigator.navigate("MapCameraScreen");
+    }
+
   return (
     <View style={styles.container}>
         <Text>Email: {auth.currentUser?.email}</Text>
@@ -46,6 +50,12 @@ const Home = () => {
     >
         <Text style={styles.buttonText}>Add Pin</Text>
     </TouchableOpacity>
+{/* `    <TouchableOpacity
+        onPress={ToMapCamera}
+        style={styles.button}
+    >
+        <Text style={styles.buttonText}>Take A Picture</Text>
+    </TouchableOpacity>` */}
     </View>
   );
 };

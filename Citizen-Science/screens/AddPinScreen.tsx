@@ -159,11 +159,11 @@ const pickImage = async () => {
         onPress={getLocation}
         style={styles.button}
       />
-      <Button
+      {/* <Button
         title="Take Picture"
         onPress={MapCamera}
         style={styles.button}
-      />      
+      />       */}
       <Button 
         title="Pick an image from camera roll" 
         style={styles.button}

@@ -2,11 +2,7 @@ import { Camera, CameraType } from 'expo-camera';
 import { useState } from 'react';
 import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-interface CameraScreenProps {                                                                      //allows navigation through screens
-    navigation: any;
-}
-
-export default function App() {
+export default function MapCameraScreen(){
   const [type, setType] = useState(CameraType.back);
   const [permission, requestPermission] = Camera.useCameraPermissions();
 
