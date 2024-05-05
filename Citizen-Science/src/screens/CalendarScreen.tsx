@@ -171,8 +171,10 @@ const handleDelete = async (eventId: number) => {
 		setDescription(item.description);
 
 		console.log("Setting date in handleModify:", new Date(item.date));
+		const formattedDate = handleDateChange(item.date); // Ensure you have a utility to format the date
 
 		setSelectedDate(new Date(item.date));
+		setEventDate(formattedDate);
 		setStartTime(item.startTime);
 		setEndTime(item.endTime);
 
@@ -196,6 +198,7 @@ const handleDelete = async (eventId: number) => {
 				eventId,
 				userId,
 				eventName,
+				eventDate,
 				description,
 				location,
 				startTime,
