@@ -6,7 +6,6 @@ import * as Location from 'expo-location';
 import { mapStyle } from './Map.Style';
 import * as ImagePicker from 'expo-image-picker';
 import PinPicScreen from '../PinPicScreen';
-import { MapHome } from '../MapHome/MapHome.Screen';
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
@@ -74,8 +73,8 @@ export const MapScreen = (props: PinPicScreenProps) => {
   };
 
   const addPictureFromGallery = () => props.navigation.navigate("PinPicScreen");                          //navigates to picture screen
-
-  const returnToMapHome = () => props.navigation.navigate("MapHome");                                     //navigates back to MapHome screen
+  const returnToMapHome = () => props.navigation.navigate("MapHome"); 
+  const advancedOptions = () => props.navigation.navigate("AddPin");                                     //navigates back to MapHome screen
 
 
   return (
@@ -104,6 +103,9 @@ export const MapScreen = (props: PinPicScreenProps) => {
             />
             <TouchableOpacity onPress={addCustomMarker}>
               <Text>Add Marker</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={advancedOptions}>
+              <Text>Advanced Options</Text>
             </TouchableOpacity>
           </View>
         </View>

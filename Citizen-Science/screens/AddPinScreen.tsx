@@ -6,7 +6,6 @@ import * as MediaLibrary from 'expo-media-library';
 import { Picker } from '@react-native-picker/picker';
 import { Camera } from 'expo-camera';
 import MapCamera from './MapCameraScreen';
-
 interface AddPinScreenProps {                                                                      //allows navigation through screens
   navigation: any;
 }
@@ -28,7 +27,6 @@ export const AddPin = (props: AddPinScreenProps) => {                           
   //request for camera permission
   const requestCameraPermission = async () => {
     try {
-      
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
         console.log('Permission to access camera roll was denied');
