@@ -38,14 +38,14 @@ export const deleteEvent = async (eventId: number, userId: number) => {
 }
 
 
-export const modifyEvent = async (eventId: number, userId: number, title: string, description: string, location: string, date: string, startTime: string, endTime: string) => {
+export const modifyEvent = async (eventId: number, userId: number, title: string, location: string, description: string, date: string, startTime: string, endTime: string) => {
     const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/calendar/${eventId}/${userId}`, {
 
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({title, description, location, date, startTime, endTime}),
+        body: JSON.stringify({title, location, description, date, startTime, endTime}),
 
     });
 

@@ -12,7 +12,7 @@ import {createEvent, deleteEvent, getEventsForMonth, getEventsOnDate, modifyEven
 
 
 interface Item {
-eventId: number;
+	eventId: number;
     name: string;
     height: number;
     date: string;
@@ -25,10 +25,9 @@ interface EventItems {
 	[date: string]: Item[];
 }
 
-
 const CalendarScreen: React.FC = () => {
 
-const { userToken, setUserToken } = useContext(AuthContext);
+	const { userToken, setUserToken } = useContext(AuthContext);
 	const decodedToken = userToken ? jwtDecode<AccessToken>(userToken) : null;
 	const userId = decodedToken ? decodedToken.user_id : NaN;
 	const [items, setItems] = useState({});
@@ -37,9 +36,7 @@ const { userToken, setUserToken } = useContext(AuthContext);
 	const [eventDate, setEventDate] = useState('');
 	const now = new Date();
 	const localMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
 	const [selectedDate, setSelectedDate] = useState(localMidnight);
-
 	const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 	const [eventStartTime, setEventStartTime] = useState(new Date());
 	const [startTime, setStartTime] = useState('');
@@ -47,10 +44,8 @@ const { userToken, setUserToken } = useContext(AuthContext);
 	const [endTime, setEndTime] = useState('');
 	const [location, setLocation] = useState('');
 	const [description, setDescription] = useState('');
-
-const [isModifying, setIsModifying] = useState(false);
+	const [isModifying, setIsModifying] = useState(false);
 	const [eventId, setEventId] = useState<number | null>(null);
-
 
 	const loadItems = async (day: any) => {
 		if (!day) {
@@ -115,11 +110,6 @@ const [isModifying, setIsModifying] = useState(false);
 		}
 	};
 
-
-
-
-
-
 	const userCreateEvent = async () => {
 		
 		//To check if all fields are filled
@@ -163,27 +153,26 @@ const handleDelete = async (eventId: number) => {
 		// console.log("Modifying event with Date:", item.date);
 		// console.log("Modifying event with Date:", item.startTime);
 		// console.log("Modifying event with Date:", item.endTime);
-
-
+		const formattedDate = handleDateChange(item.date); // Ensure you have a utility to format the date
 		setEventId(item.eventId);
 		setEventName(item.name);
 		setLocation(item.location);
 		setDescription(item.description);
 
 		console.log("Setting date in handleModify:", new Date(item.date));
-		const formattedDate = handleDateChange(item.date); // Ensure you have a utility to format the date
-
-		setSelectedDate(new Date(item.date));
+		
+		//setSelectedDate(new Date(selectedItem?.date));
 		setEventDate(formattedDate);
 		setStartTime(item.startTime);
 		setEndTime(item.endTime);
-
 
 		setTimeout(() => {
 			setShowModal(false);
 			setIsModifying(true);
 			setModalVisible(true);
 		}, 0);
+
+		
 	};
 
 
@@ -198,9 +187,9 @@ const handleDelete = async (eventId: number) => {
 				eventId,
 				userId,
 				eventName,
-				eventDate,
-				description,
 				location,
+				description,
+				eventDate,
 				startTime,
 				endTime
 			);
@@ -242,7 +231,12 @@ const handleDelete = async (eventId: number) => {
 		return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
 	};
 
-
+	const handleSubmit = () => {
+		setEventName(tempEventName);
+		setLocation(tempLocation);
+		setDescription(tempDescription);
+		// Proceed to update the backend or close the modal
+	};
 
 	const handleDateChange = (event: any, selectedDate?: Date) => {
 		if (selectedDate) {
@@ -253,9 +247,6 @@ const handleDelete = async (eventId: number) => {
 			setSelectedDate(selectedDate);
 		}
 	};
-
-
-
 
 	const handleStartTimeChange = (event: any, selectedTime?: Date) => {
 		if (selectedTime) {
@@ -286,10 +277,6 @@ const handleDelete = async (eventId: number) => {
 		const minutesStr = minutes < 10 ? `0${minutes}` : minutes;
 		return `${hours}:${minutesStr} ${ampm}`;
 	};
-
-
-
-
 
 	//show modal for viewing event details
 	const [showModal, setShowModal] = useState(false);
@@ -432,6 +419,11 @@ const renderItem = (item: Item) => {
 	};
 
 
+
+	// Temporary state for form changes
+const [tempEventName, setTempEventName] = useState(eventName);
+const [tempLocation, setTempLocation] = useState(location);
+const [tempDescription, setTempDescription] = useState(description);
 	return (
 		<SafeAreaView style={[styles.container, {backgroundColor: modalVisible ? 'white' : 'white'}]}>
 		  <Agenda
