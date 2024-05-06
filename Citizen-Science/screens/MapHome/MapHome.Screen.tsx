@@ -57,41 +57,6 @@ export const MapHome = (props: MapPageScreenProps) => {
             </Appbar>
             <Card style = {HomePage.card}> 
                 <Card.Content>
-                    <MapView style={HomePage.smallmap} initialRegion={initialRegion}>
-                        {currentLocation && (
-                            <Marker
-                            coordinate={{
-                            latitude: currentLocation.latitude,
-                            longitude: currentLocation.longitude,
-                            }}
-                            title="Your Location"
-                            />
-                        )}
-                      {markersData.map((marker, index) => (
-                        <Marker
-                          key={index}
-                          coordinate={marker.coordinate}
-                          title={marker.title}
-                          description={marker.description}
-                          >
-                          <Image source={customMarkerImage} style={{ width: 30, height: 30 }} />
-                        </Marker>
-                      ))}
-                    {UserMarkersData.map((marker, index) => (
-                      <Marker
-                          pinColor='plum'
-                          key={index}
-                          coordinate={marker.coordinate}
-                        >
-                        <Callout>
-                          <View style={HomePage.bubble}>
-                            <Text>{marker.title}</Text>
-                            <Text>{marker.description}</Text>
-                          </View>
-                        </Callout>
-                      </Marker>
-                    ))}
-                    </MapView>
                     <Button style = {HomePage.button}
                         buttonColor='#0810F6'
                         mode="contained"
