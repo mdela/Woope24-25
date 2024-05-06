@@ -1,20 +1,125 @@
 import { mdiStairsDown } from '@mdi/js';
 import React, {useState} from 'react';
-import { View, StyleSheet, ImageBackground, SafeAreaViewComponent, Button, Modal} from 'react-native';
+import { View, StyleSheet, ImageBackground, SafeAreaViewComponent, Button,TextInput, Modal, Dimensions, TouchableOpacity} from 'react-native';
 import {Avatar, Surface, Icon, IconButton, Text, Card} from 'react-native-paper';
 import { red100 } from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 const ResourceScreen = () => {
 
+    interface Item {
+        resourceId: number;
+        name: string;
+        description: string;
+
+        
+    }
+
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
     const image = require('../../assets/csun.png');
+    const { width, height } = Dimensions.get('window');
 
     const [modalVisible, setModalVisible] = useState(false);
+    const [addModalVisible, setAddModalVisible] = useState(false);
+    const [open, setOpen] = useState(false);
+    const [value, setValue] = useState(null);
+    const [items, setItems] = useState([
+        {label: 'Home', value: 'Home'},
+        {label: 'Family', value: 'Family'},
+        {label: 'Science', value: 'Science'},
+        {label: 'Culture', value: 'Culture'},
+        {label: 'Law', value: 'Law'},
+        {label: 'Jobs', value: 'Jobs'}
+    ]);
+    const renderItem = (item: Item) => {
+        return (
+			<TouchableOpacity style={{marginRight: 10, marginTop: 17}}>
+                <Card>
+                    <Card.Content>
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                            }}>
+
+							{/*<Button title="Delete All Events" onPress={handleDeleteAllEvents} />*/}
+
+
+
+							<Text style={{fontWeight: 'bold'}}>
+                                {item.name} {'\n'}
+                            </Text>
+                            <Avatar.Text label="C"/>
+                        </View>
+                    </Card.Content>
+                </Card>
+            </TouchableOpacity>
+		);
+    };
     return (
         <SafeAreaView>
-            
+            <IconButton 
+                icon={'plus'} 
+                style={{marginLeft: 350}} onPress={() => setAddModalVisible(true)} />
+            <View>
+                <Modal 
+                    visible={addModalVisible}
+                    onDismiss={() => setAddModalVisible(false)}
+                    transparent={true}
+                >
+                    <View style={styles.centeredView}>
+                        <View style={{
+                            width: width * 0.95, // Apply width here
+                            height: height * 0.75, // Apply height here
+                            backgroundColor: 'white',
+                            borderRadius: 20,
+                            padding: 20,
+                            alignItems: 'center',
+                            shadowColor: '#000',
+                            shadowOffset: { width: 0, height: 2 },
+                            shadowOpacity: 0.25,
+                            shadowRadius: 4,
+                            elevation: 5
+                        }}>
+                            <View style={{paddingLeft: 0, paddingRight:350}}>
+                                <IconButton  icon={"close"} onPress={() => setAddModalVisible(false)}/>
+                            </View>
+                            <TextInput
+                            style={styles.input}
+                            placeholder="Title"
+                            value={title}
+                            onChangeText={setTitle}
+                            placeholderTextColor={'darkgray'}
+                            />
+                            <TextInput
+                            style={styles.input}
+                            placeholder="Description"
+                            value={description}
+                            onChangeText={setDescription}
+                            placeholderTextColor="darkgray"
+                            />
+
+                            <View style={{flexDirection: 'row'}}>
+                                <Text style={{marginTop: 20, marginLeft: 70}}>Category: </Text>
+                                <DropDownPicker
+                                    style={{width: 250}}
+                                    open={open}
+                                    value={value}
+                                    items={items}
+                                    setOpen={setOpen}
+                                    setValue={setValue}
+                                    setItems={setItems}
+                                    zIndex={1000}  // Ensure dropdown is layered above other components
+                                />
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+            </View>
             <View style={styles.containerLeft}>
-            
                 <Surface style={styles.surfaceLeft} elevation={4}>
                     <IconButton 
                         style={styles.avatarLeft} icon={'home'}
@@ -30,18 +135,30 @@ const ResourceScreen = () => {
                     <Modal 
                         visible={modalVisible}
                         onDismiss={() => setModalVisible(false)}
-                    
-
+                        transparent={true}
                     >
                         <View style={styles.centeredView}>
-                            <View style={styles.modalView}>
-                               <Card>
-                                    <Card.Content>
-                                        <View>
-                                            <Text>Testing</Text>
-                                        </View>
-                                    </Card.Content>
-                               </Card>
+                            <View style={{
+                            width: width * 0.95, // Apply width here
+                            height: height * 0.75, // Apply height here
+                            backgroundColor: 'white',
+                            borderRadius: 20,
+                            padding: 20,
+                            alignItems: 'center',
+                            shadowColor: '#000',
+                            shadowOffset: { width: 0, height: 2 },
+                            shadowOpacity: 0.25,
+                            shadowRadius: 4,
+                            elevation: 5
+                        }}>
+                            <View style={{paddingLeft: 0, paddingRight:350}}>
+                            <IconButton  icon={"close"} onPress={() => setModalVisible(false)}/>
+                            </View>
+                            <View style={{padding: 10}}>
+
+
+
+                             </View>
                             </View>
                         </View>
                     </Modal>
@@ -50,25 +167,46 @@ const ResourceScreen = () => {
                 
 
                 <Surface style={styles.surfaceLeft} elevation={4}>
-                    <IconButton style={styles.avatarLeft} icon={'beaker'}></IconButton>
+                    <IconButton 
+                        style={styles.avatarLeft} 
+                        icon={'beaker'} 
+                        onPress={() => setModalVisible(true)}
+                    
+                    />
                 </Surface>
 
                 <Surface style={styles.surfaceLeft} elevation={4}>
-                    <IconButton style={styles.avatarLeft} icon={'briefcase'}></IconButton>
+                    <IconButton 
+                        style={styles.avatarLeft} 
+                        icon={'briefcase'}
+                        onPress={() => setModalVisible(true)}
+                    />
                 </Surface>
 
             </View>
             <View style={styles.containerRight}>
                 <Surface style={styles.surfaceRight} elevation={4}>
-                    <IconButton style={styles.avatarLeft} icon={'human-male-female-child'}></IconButton>
+                    <IconButton 
+                        style={styles.avatarLeft} 
+                        icon={'human-male-female-child'}
+                        onPress={() => setModalVisible(true)}
+                        />
                 </Surface>
 
                 <Surface style={styles.surfaceRight} elevation={4}>
-                    <IconButton style={styles.avatarLeft} icon={'tent'}></IconButton>
+                    <IconButton 
+                        style={styles.avatarLeft} 
+                        icon={'tent'}
+                        onPress={() => setModalVisible(true)}
+                        />
                 </Surface>
 
                 <Surface style={styles.surfaceRight} elevation={4}>
-                    <IconButton style={styles.avatarLeft} icon={'gavel'}></IconButton>
+                    <IconButton 
+                        style={styles.avatarLeft} 
+                        icon={'gavel'}
+                        onPress={() => setModalVisible(true)}
+                        />
                 </Surface>
 
             </View>
@@ -84,6 +222,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 200,
+    
     },
     containerRight: {
         flex: 1,
@@ -91,6 +230,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 0,
     },
+
     text: {
         
         fontSize: 24,
@@ -153,16 +293,22 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 22,
-      },
-      modalView: {
-        margin: 20,
-        backgroundColor: 'white',
-        borderRadius: 20,
-        padding: 25,
-        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Optional: for a semi-transparent background
+    },
+    input: {
+		height: 50,
+		borderColor: 'gray',
+		borderWidth: 1,
+		marginBottom: 30,
+		paddingHorizontal: 10,
+		width: 250,
+		backgroundColor: 'white',
+	  },
+      pickerStyle: {
+        width: 250,
+        height: 50,
+    },
 
-      },
 });
 
 export default ResourceScreen;
