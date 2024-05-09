@@ -1,10 +1,12 @@
 import { mdiStairsDown } from '@mdi/js';
-import React, {useState} from 'react';
-import { View, StyleSheet, ImageBackground, SafeAreaViewComponent, Button,TextInput, Modal, Dimensions, TouchableOpacity} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import { View, StyleSheet, ImageBackground, SafeAreaViewComponent, Button,TextInput, Modal, ScrollView, Dimensions, TouchableOpacity} from 'react-native';
 import {Avatar, Surface, Icon, IconButton, Text, Card} from 'react-native-paper';
 import { red100 } from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DropDownPicker from 'react-native-dropdown-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const ResourceScreen = () => {
 
@@ -12,20 +14,23 @@ const ResourceScreen = () => {
         resourceId: number;
         name: string;
         description: string;
-
+        category: string,
         
     }
 
+    const [currentCategory, setCurrentCategory] = useState('');
+    const [items, setItems] = useState<Item[]>([]);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const image = require('../../assets/csun.png');
     const { width, height } = Dimensions.get('window');
-
+    const [category, setCategory] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [addModalVisible, setAddModalVisible] = useState(false);
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(null);
-    const [items, setItems] = useState([
+    const [cat, setCat] = useState([
+    
         {label: 'Home', value: 'Home'},
         {label: 'Family', value: 'Family'},
         {label: 'Science', value: 'Science'},
@@ -33,38 +38,54 @@ const ResourceScreen = () => {
         {label: 'Law', value: 'Law'},
         {label: 'Jobs', value: 'Jobs'}
     ]);
-    const renderItem = (item: Item) => {
-        return (
-			<TouchableOpacity style={{marginRight: 10, marginTop: 17}}>
-                <Card>
-                    <Card.Content>
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                            }}>
 
-							{/*<Button title="Delete All Events" onPress={handleDeleteAllEvents} />*/}
+    const [resources, setResources] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState(null);
 
-
-
-							<Text style={{fontWeight: 'bold'}}>
-                                {item.name} {'\n'}
-                            </Text>
-                            <Avatar.Text label="C"/>
-                        </View>
-                    </Card.Content>
-                </Card>
-            </TouchableOpacity>
-		);
+   // Load items when the component mounts
+   useEffect(() => {
+    const loadItems = async () => {
+        try {
+            const itemsString = await AsyncStorage.getItem('@items');
+            const loadedItems = itemsString ? JSON.parse(itemsString) : [];
+            setItems(loadedItems);
+        } catch (e) {
+            console.error("Failed to load items:", e);
+        }
     };
+
+    loadItems();
+}, []);
+
+const handleAddItem = async () => {
+    const newItem: Item = {
+        resourceId: Math.random(),  // Simple unique ID generation for demo
+        name: title,
+        description: description,
+        category: category
+    };
+
+    try {
+        const newItems = [...items, newItem];
+        const itemsString = JSON.stringify(newItems);
+        await AsyncStorage.setItem('@items', itemsString);
+        setItems(newItems);
+        setTitle('');
+        setDescription('');
+        setCategory('');
+        setModalVisible(false);
+    } catch (e) {
+        console.error("Failed to save item:", e);
+    }
+};
+
     return (
         <SafeAreaView>
             <IconButton 
                 icon={'plus'} 
                 style={{marginLeft: 350}} onPress={() => setAddModalVisible(true)} />
             <View>
+                
                 <Modal 
                     visible={addModalVisible}
                     onDismiss={() => setAddModalVisible(false)}
@@ -107,14 +128,16 @@ const ResourceScreen = () => {
                                 <DropDownPicker
                                     style={{width: 250}}
                                     open={open}
-                                    value={value}
-                                    items={items}
+                                    value={category}
+                                    items={cat}
                                     setOpen={setOpen}
-                                    setValue={setValue}
-                                    setItems={setItems}
+                                    setValue={setCategory}
+                                    setItems={setCat}
                                     zIndex={1000}  // Ensure dropdown is layered above other components
                                 />
                             </View>
+
+                            <IconButton icon='plus' onPress={handleAddItem}></IconButton>
                         </View>
                     </View>
                 </Modal>
@@ -123,7 +146,9 @@ const ResourceScreen = () => {
                 <Surface style={styles.surfaceLeft} elevation={4}>
                     <IconButton 
                         style={styles.avatarLeft} icon={'home'}
-                        onPress={() => setModalVisible(true)}
+                        onPress={() => {
+                            setModalVisible(true);
+                            setCurrentCategory('Home');}}
                     ></IconButton>
                     
                 </Surface>
@@ -132,6 +157,7 @@ const ResourceScreen = () => {
                 </View>
                 
                 <View>
+               
                     <Modal 
                         visible={modalVisible}
                         onDismiss={() => setModalVisible(false)}
@@ -151,13 +177,41 @@ const ResourceScreen = () => {
                             shadowRadius: 4,
                             elevation: 5
                         }}>
-                            <View style={{paddingLeft: 0, paddingRight:350}}>
-                            <IconButton  icon={"close"} onPress={() => setModalVisible(false)}/>
-                            </View>
+                            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start'}}>
+                                    <View style={{justifyContent: 'flex-start', marginRight: 330}}>
+                                    <IconButton  icon={"close"} onPress={() => setModalVisible(false)}/>
+                                    
+                                    </View>
+                                </View>
+                                
+
+                                
+                            
                             <View style={{padding: 10}}>
-
-
-
+                            <ScrollView style={{ width: '100%' }}> 
+                            {items.filter(item => item.category === currentCategory).map((item, index) => (
+                                
+            
+                                <TouchableOpacity style={{marginRight: 10, marginTop: 17}}>
+                                <Card key={index}> 
+                                    <Card.Content>
+                                        <Text>{item.name}</Text>
+                                        <Text>{item.description}</Text>
+                                        <View
+                                                style={{
+                                                    flexDirection: 'row',
+                                                // justifyContent: 'space-between',
+                                                    //alignItems: 'center',
+                                                    paddingLeft: 200,
+                                                }}>
+                                            <Avatar.Text label="C"/>
+                                        </View>
+                                    </Card.Content>
+                                </Card>
+                                </TouchableOpacity>
+                                
+            ))}
+            </ScrollView>
                              </View>
                             </View>
                         </View>
@@ -170,7 +224,9 @@ const ResourceScreen = () => {
                     <IconButton 
                         style={styles.avatarLeft} 
                         icon={'beaker'} 
-                        onPress={() => setModalVisible(true)}
+                        onPress={() => {
+                            setModalVisible(true);
+                            setCurrentCategory('Science')}}
                     
                     />
                 </Surface>
@@ -179,7 +235,9 @@ const ResourceScreen = () => {
                     <IconButton 
                         style={styles.avatarLeft} 
                         icon={'briefcase'}
-                        onPress={() => setModalVisible(true)}
+                        onPress={() => {
+                            setModalVisible(true);
+                            setCurrentCategory('Jobs')}}
                     />
                 </Surface>
 
@@ -189,7 +247,9 @@ const ResourceScreen = () => {
                     <IconButton 
                         style={styles.avatarLeft} 
                         icon={'human-male-female-child'}
-                        onPress={() => setModalVisible(true)}
+                        onPress={() => {
+                            setModalVisible(true);
+                            setCurrentCategory('Family')}}
                         />
                 </Surface>
 
@@ -197,7 +257,9 @@ const ResourceScreen = () => {
                     <IconButton 
                         style={styles.avatarLeft} 
                         icon={'tent'}
-                        onPress={() => setModalVisible(true)}
+                        onPress={() => {
+                            setModalVisible(true);
+                            setCurrentCategory('Culture')}}
                         />
                 </Surface>
 
@@ -205,7 +267,9 @@ const ResourceScreen = () => {
                     <IconButton 
                         style={styles.avatarLeft} 
                         icon={'gavel'}
-                        onPress={() => setModalVisible(true)}
+                        onPress={() => {
+                            setModalVisible(true);
+                            setCurrentCategory('Law')}}
                         />
                 </Surface>
 
