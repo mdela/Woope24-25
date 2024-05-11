@@ -187,24 +187,32 @@ const handleAddItem = async () => {
 
                                 
                             
-                            <View style={{padding: 10}}>
-                            <ScrollView style={{ width: '100%' }}> 
+                            <View style={{width: '100%'}}>
+                            <ScrollView style={{ width: '100%', backgroundColor: 'transparent', zIndex: 1, height: '90%', marginBottom: 0}}> 
                             {items.filter(item => item.category === currentCategory).map((item, index) => (
                                 
             
-                                <TouchableOpacity style={{marginRight: 10, marginTop: 17}}>
-                                <Card key={index}> 
+                                <TouchableOpacity style={{marginRight: 10, marginTop: 17, width: '100%'}}>
+                                <Card key={index} style={{flex: 1}}> 
                                     <Card.Content>
-                                        <Text>{item.name}</Text>
-                                        <Text>{item.description}</Text>
+                                        <View style={{flexDirection: 'row', justifyContent: 'space-between',}}>
+
+                                        
                                         <View
                                                 style={{
-                                                    flexDirection: 'row',
-                                                // justifyContent: 'space-between',
+                                                    flexDirection: 'column',
+                                                    
                                                     //alignItems: 'center',
-                                                    paddingLeft: 200,
+                                                    
+                                                    
                                                 }}>
-                                            <Avatar.Text label="C"/>
+                                        <Text>{item.name}</Text>
+                                        <Text>{item.description}</Text>
+                                        
+                                        </View>
+                                        <Avatar.Text label="C"/>
+                                                                                  
+                                            
                                         </View>
                                     </Card.Content>
                                 </Card>
