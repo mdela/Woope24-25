@@ -105,8 +105,9 @@ const handleAddItem = async () => {
                             shadowRadius: 4,
                             elevation: 5
                         }}>
-                            <View style={{paddingLeft: 0, paddingRight:350}}>
-                                <IconButton  icon={"close"} onPress={() => setAddModalVisible(false)}/>
+                            <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '110%', paddingHorizontal: 10}}>
+                                <IconButton  icon={"close"} onPress={() => setAddModalVisible(false)} style={{marginLeft: 0, alignSelf: 'flex-start' }}/>
+                                <IconButton icon='plus' onPress={() =>{ handleAddItem(); setAddModalVisible(false);}}></IconButton>
                             </View>
                             <TextInput
                             style={styles.input}
@@ -123,10 +124,8 @@ const handleAddItem = async () => {
                             placeholderTextColor="darkgray"
                             />
 
-                            <View style={{flexDirection: 'row'}}>
-                                <Text style={{marginTop: 20, marginLeft: 70}}>Category: </Text>
                                 <DropDownPicker
-                                    style={{width: 250}}
+                                    style={{alignSelf: 'center', width: "70%"}}
                                     open={open}
                                     value={category}
                                     items={cat}
@@ -134,27 +133,27 @@ const handleAddItem = async () => {
                                     setValue={setCategory}
                                     setItems={setCat}
                                     zIndex={1000}  // Ensure dropdown is layered above other components
+                                    placeholder='Category'
                                 />
-                            </View>
+                          
 
-                            <IconButton icon='plus' onPress={handleAddItem}></IconButton>
+                            
                         </View>
                     </View>
                 </Modal>
             </View>
             <View style={styles.containerLeft}>
                 <Surface style={styles.surfaceLeft} elevation={4}>
+                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                     <IconButton 
                         style={styles.avatarLeft} icon={'home'}
                         onPress={() => {
                             setModalVisible(true);
                             setCurrentCategory('Home');}}
                     ></IconButton>
-                    
+                        
+                    </View>
                 </Surface>
-                <View>
-                <Text style={styles.text} variant="displayLarge">Display Large</Text>
-                </View>
                 
                 <View>
                
@@ -178,10 +177,15 @@ const handleAddItem = async () => {
                             elevation: 5
                         }}>
                             <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start'}}>
-                                    <View style={{justifyContent: 'flex-start', marginRight: 330}}>
+                                    <View style={{marginRight: 130}}>
                                     <IconButton  icon={"close"} onPress={() => setModalVisible(false)}/>
-                                    
                                     </View>
+                                    <View style={{marginRight: 180}}>
+                                    <Text>{currentCategory}</Text>
+                                    </View>
+
+                                     
+                                    
                                 </View>
                                 
 
@@ -191,7 +195,6 @@ const handleAddItem = async () => {
                             <ScrollView style={{ width: '100%', backgroundColor: 'transparent', zIndex: 1, height: '90%', marginBottom: 0}}> 
                             {items.filter(item => item.category === currentCategory).map((item, index) => (
                                 
-            
                                 <TouchableOpacity style={{marginRight: 10, marginTop: 17, width: '100%'}}>
                                 <Card key={index} style={{flex: 1}}> 
                                     <Card.Content>
@@ -380,7 +383,12 @@ const styles = StyleSheet.create({
         width: 250,
         height: 50,
     },
-
+    modalTitle: {
+        fontSize: 15,
+        color: '#000',
+        marginTop: 15,
+        paddingLeft: 150
+    },
 });
 
 export default ResourceScreen;
