@@ -1,58 +1,107 @@
 import React from 'react';
-import { SafeAreaView, ScrollView } from 'react-native';
+import { SafeAreaView, ScrollView, View, Image, Text } from 'react-native';
 import {Appbar} from 'react-native-paper';
-import {Card, Button} from 'react-native-paper';
+import {Card, Button, TextInput} from 'react-native-paper';
 import * as Location from 'expo-location';
-import {useState} from 'react';
+import React2, {useState, useEffect} from 'react';
 import {HomePage} from './MapHome.Style'
+import MapView, { Callout, Marker } from "react-native-maps";
+import { UserMarkersData, markersData } from '../Map/Map.Screen';
 
-interface MapPageScreenProps {
-	navigation: any;
+const customMarkerImage = require('../../../assets/College_marker.png')
+interface MapPageScreenProps {                                                                      //allows navigation through screens
+    navigation: any;
 }
 
 export const MapHome = (props: MapPageScreenProps) => {
-	const [location, setLocation] =useState({})
-	const getLocation = () => {
-		(async() => {
-			let {status} = await Location.requestForegroundPermissionsAsync()
-			if (status == 'granted'){
-				console.log('Permission successful!')
-			} else {
-				console.log('Permission denied')
-			}
-			const loc = await Location.getCurrentPositionAsync()
-			console.log(loc)
-			setLocation(loc)
-		})()
-	};
-	const ViewMap = () => props.navigation.navigate('MapScreen');
-	const ViewSMap = () => props.navigation.navigate('SMapScreen');
+    const [currentLocation, setCurrentLocation] = useState(null);
+    const [initialRegion, setInitialRegion] = useState(null);
+    useEffect(() => {                                                                                        //gets user's initial map location
+        const getLocation = async () => {        
+          let location = await Location.getCurrentPositionAsync({});
+          setCurrentLocation(location.coords);
+    
+          setInitialRegion({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: 0.005,
+            longitudeDelta: 0.005,
+          });
+        };
+    
+        getLocation();
+      }, []);
 
-	return(
-		<SafeAreaView style = {HomePage.content}>
-			<ScrollView style = {HomePage.view}>
-				<Appbar>
-					<Appbar.BackAction />
-					<Appbar.Content title = "Map"/>
-				</Appbar>
-				<Card>
-					<Card.Content>
-						<Button
-							mode="contained"
-							onPress={() => {
-								getLocation();
-								ViewMap();
-							}}
-						>Place pin</Button>
-						<Button
-							mode="contained"
-							onPress={() => {
-								ViewSMap();
-							}}
-						>View Map</Button>
-					</Card.Content>
-				</Card>
-			</ScrollView>
-		</SafeAreaView>
-	);
+    const [location, setLocation] =useState({})                                                     //gets permissions from user's device
+    const getLocation = () => {
+        (async() => {
+          let {status} = await Location.requestForegroundPermissionsAsync()
+          if (status == 'granted'){
+            console.log('Permission successful!')
+          } else {
+            console.log('Permission denied')
+          }
+          const loc = await Location.getCurrentPositionAsync()
+          console.log(loc)
+          setLocation(loc)
+        })()
+    };
+    const ViewMap = () => props.navigation.navigate("MapScreen");                                    //handles navigation
+    const ViewSMap = () => props.navigation.navigate("SMapScreen");
+    const AddPin = () => props.navigation.navigate("AddPinScreen"); 
+
+    return(
+        <SafeAreaView style = {HomePage.content}>
+            <Appbar>
+                <Appbar.Content title = "Map"/>
+            </Appbar>
+            <Card style = {HomePage.card}> 
+                <Card.Content>
+                    <MapView style={HomePage.smallmap} initialRegion={initialRegion}>
+                        {currentLocation && (
+                            <Marker
+                            coordinate={{
+                            latitude: currentLocation.latitude,
+                            longitude: currentLocation.longitude,
+                            }}
+                            title="Your Location"
+                            />
+                        )}
+                      {markersData.map((marker, index) => (
+                        <Marker
+                          key={index}
+                          coordinate={marker.coordinate}
+                          title={marker.title}
+                          description={marker.description}
+                          >
+                          <Image source={customMarkerImage} style={{ width: 30, height: 30 }} />
+                        </Marker>
+                      ))}
+                    {UserMarkersData.map((marker, index) => (
+                      <Marker
+                          pinColor='plum'
+                          key={index}
+                          coordinate={marker.coordinate}
+                        >
+                        <Callout>
+                          <View style={HomePage.bubble}>
+                            <Text>{marker.title}</Text>
+                            <Text>{marker.description}</Text>
+                          </View>
+                        </Callout>
+                      </Marker>
+                    ))}
+                    </MapView>
+                    <Button style = {HomePage.button}
+                        buttonColor='#0810F6'
+                        mode="contained"
+                        onPress={() => {
+                        getLocation();
+                        ViewMap();
+                        }}
+                    >Place pin</Button>
+                </Card.Content>
+            </Card>
+        </SafeAreaView>
+    );
 }

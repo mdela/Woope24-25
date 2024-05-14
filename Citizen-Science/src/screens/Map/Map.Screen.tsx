@@ -71,14 +71,9 @@ export const MapScreen = (props: PinPicScreenProps) => {
     setMarkerImage("");
   };
 
-//Navigators
   const addPictureFromGallery = () => props.navigation.navigate("PinPicScreen");                          //navigates to picture screen
   const returnToMapHome = () => props.navigation.navigate("MapHome"); 
-//  const advancedOptions = () => props.navigation.navigate("AddPinScreen");                               //provides more details to the user, disabled due to Nested Navigation Error
- 
-const advancedOptions = () => {                                                                            //Temp disabled due to Nested Navigation Error
-    console.log('Nested navigation needed to AddPinScreen')
-  }                               
+  const advancedOptions = () => props.navigation.navigate("AddPin");                                     //navigates back to MapHome screen
 
 
   return (

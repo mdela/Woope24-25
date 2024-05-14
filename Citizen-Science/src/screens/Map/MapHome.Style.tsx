@@ -1,18 +1,38 @@
 import {StyleSheet} from "react-native";
+import {Button} from 'react-native-paper';
+
 
 export const HomePage = StyleSheet.create({
-	content: {
-		display : "flex",
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-		flexDirection: "row",
-		backgroundColor: "#5EA1E9",
-	},
-	view: {
-		width: "80%"
-	},
-	cardButton: {
-		color: "#5EA1E9",
-	}
+    content: {
+        backgroundColor: "#5EA1E9",
+    },
+    card: {
+        borderColor: "#000000",
+        borderWidth: 4,
+        position: "relative",
+        paddingLeft: 50,
+        paddingRight: 50,
+        borderRadius: 20,
+        backgroundColor: "#5EA1E9",
+    },
+    flexdirec: {
+        flexDirection: "column",
+    },
+    button:{
+    },
+    smallmap:{
+        alignSelf: "center",
+        width: "90%",
+        height: "90%",
+      },
+      bubble: {
+        flexDirection: 'column',
+        alignSelf: 'flex-start',
+        backgroundColor: '#fff',
+        borderRadius: 6,
+        borderColor: '#ccc',
+        borderWidth: 0.5,
+        padding: 15,
+        width: 150,
+      },
 })

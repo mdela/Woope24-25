@@ -6,12 +6,16 @@ import * as MediaLibrary from 'expo-media-library';
 import { Picker } from '@react-native-picker/picker';
 //import MapCamera from './MapCameraScreen';
 
-export const AddPinScreen = () => {                                           //allows navigation through screens 
+interface AddPinScreenProps {                                  //allows navigation through screens 
+	navigation: any;
+}
+
+export const AddPinScreen = () => {                                           
   const [longitude, setLongitude] = useState('');
   const [latitude, setLatitude] = useState('');
   const [locationName, setLocationName] = useState('');
   const [locationDetails, setLocationDetails] = useState('');
-  const [pinType, setPinType] = useState('hazard');  // Sets the default pin type to hazard
+  const [pinType, setPinType] = useState('hazard');           // Sets the default pin type to hazard
   const [image, setImage] = useState(null);
 
   //First checks for camera and GPS permissions and requests them as needed
@@ -20,7 +24,7 @@ export const AddPinScreen = () => {                                           //
     requestLocationPermission();
   }, []);
 
-  //request for camera permission
+  //Request for camera permission
   const requestCameraPermission = async () => {
     try {
       
@@ -48,6 +52,7 @@ export const AddPinScreen = () => {                                           //
     }
   };
 
+  //Request location permission and limits latitude to 6sf
   const getLocation = async () => {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -63,6 +68,7 @@ export const AddPinScreen = () => {                                           //
     }
   };
 
+  //Get's gallery permission, displays the choosen image and reads for EXIF data; EXIF data not reading at all; unsure of what's wrong
 const pickImage = async () => {
     const { status } = await MediaLibrary.getPermissionsAsync();
     if (status !== 'granted') {
