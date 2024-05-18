@@ -5,7 +5,7 @@ import {Avatar, Surface, Icon, IconButton, Text, Card} from 'react-native-paper'
 import { red100 } from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DropDownPicker from 'react-native-dropdown-picker';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 const ResourceScreen = () => {
