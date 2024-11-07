@@ -2,6 +2,19 @@ import {User} from "../interfaces/User";
 
 const pool = require('../db');
 
+/**
+ * Retrieves a user by email or phone number from the database.
+ *
+ * This function queries the database to fetch a user record that matches the provided email or
+ * phone number. If neither email nor phone number is provided, it throws an error.
+ * The function joins the `users` table with the `profile_information` table to retrieve
+ * additional user details, such as first name, last name, and date of birth.
+ *
+ * @param email - The user's email address. Optional if `phoneNumber` is provided.
+ * @param phoneNumber - The user's phone number. Optional if `email` is provided.
+ * @returns A promise that resolves to a `User` object if found, or `null` if no user matches the criteria.
+ * @throws An error if neither email nor phone number is provided, or if there is an error during the database query.
+ */
 export const getUser = async (email?: string, phoneNumber?: string) => {
 	if (!email && !phoneNumber) {
 		throw new Error("Either an email or a phone number is required.");
@@ -49,7 +62,17 @@ export const getUser = async (email?: string, phoneNumber?: string) => {
 	}
 };
 
-
+/**
+ * Retrieves a user by their user ID, including their refresh token and profile information.
+ *
+ * This function queries the database to fetch a user record based on the specified user ID.
+ * It joins the `users` table with the `profile_information` table to retrieve additional details,
+ * such as first name, last name, and date of birth. The refresh token is also included in the result.
+ *
+ * @param userId - The unique identifier of the user.
+ * @returns A promise that resolves to a `User` object if the user is found, or `null` if no user matches the user ID.
+ * @throws An error if there is an issue during the database query.
+ */
 export const getUserByRefreshToken = async (userId: string): Promise<User | null> => {
 	try {
 		const userQuery = `
@@ -80,7 +103,22 @@ export const getUserByRefreshToken = async (userId: string): Promise<User | null
 	}
 };
 
-
+/**
+ * Creates a new user in the database with profile information.
+ *
+ * This function inserts a new user record into the `users` table and, if successful,
+ * adds associated profile information in the `profile_information` table.
+ * Either an email or a phone number is required for user creation.
+ *
+ * @param email - The user's email address.
+ * @param phoneNumber - The user's phone number.
+ * @param hashedPassword - The user's hashed password.
+ * @param firstName - The user's first name.
+ * @param lastName - The user's last name.
+ * @param dateOfBirth - The user's date of birth.
+ * @returns A promise that resolves to an object containing the user's ID, email, phone number, admin status, first name, and last name.
+ * @throws An error if neither email nor phone number is provided, or if there is an error during the database query.
+ */
 export const createUser = async (email: string, phoneNumber: string, hashedPassword: string, firstName: string, lastName: string, dateOfBirth: string) => {
 	if (!email && !phoneNumber) {
 		throw new Error("Either an email or a phone number is required.");
@@ -127,6 +165,15 @@ export const createUser = async (email: string, phoneNumber: string, hashedPassw
 	}
 };
 
+/**
+ * Updates a user's first and last name in the database.
+ *
+ * @param userId - The unique identifier of the user.
+ * @param firstName - The new first name to set for the user.
+ * @param lastName - The new last name to set for the user.
+ * @returns A promise that resolves to an object containing the user's ID, updated first name, and last name.
+ * @throws An error if there is an issue during the database query.
+ */
 export const updateName = async (userId: string, firstName: string, lastName: string) => {
 	try {
 		await pool.query('BEGIN');
@@ -150,6 +197,16 @@ export const updateName = async (userId: string, firstName: string, lastName: st
 	}
 };
 
+/**
+ * Retrieves a user's full name by their user ID.
+ *
+ * This function queries the `profile_information` table to fetch the first and last name
+ * of the user associated with the given user ID.
+ *
+ * @param userId - The unique identifier of the user.
+ * @returns A promise that resolves to an object containing `first_name` and `last_name` if found, or `null` if no user is found.
+ * @throws An error if there is an issue during the database query.
+ */
 export const getUserFullNameByID = async (userId: string) => {
 	try {
 		await pool.query('BEGIN');
@@ -169,6 +226,17 @@ export const getUserFullNameByID = async (userId: string) => {
 	}
 }
 
+/**
+ * Searches for users whose names match a given query.
+ *
+ * This function performs a case-insensitive search in the `profile_information` table
+ * for users whose concatenated first and last names start with the provided name string.
+ *
+ * @param name - The name or partial name to search for.
+ * @returns A promise that resolves to an array of matching user objects, each containing `user_id`, `first_name`, and `last_name`.
+ *          If no matches are found, resolves to `null`.
+ * @throws An error if there is an issue during the database query.
+ */
 export const searchUsersWithName = async (name: string) => {
 	try{
 		await pool.query('BEGIN');
